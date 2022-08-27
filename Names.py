@@ -1,6 +1,6 @@
 database = "postgres"
-user = "danil"
-password = "perezaradka99"
+user = ""
+password = ""
 host = "localhost"
 port = 5432
 schoolName = "schooltestbd"
