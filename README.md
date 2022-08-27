@@ -12,4 +12,4 @@
 Он создаёт базу данных, пользователя(вместе с паролем), и таблицы с содержимым описанным в файле tables_school.md
 
 Для работы с файлом vk_create_group.py необходима установка библиотеки vk-api
-    python3 -m pip install vk_api
+	python3 -m pip install vk_api
