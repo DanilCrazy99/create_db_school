@@ -4,4 +4,4 @@ password = "perezaradka99"
 host = "localhost"
 port = 5432
 schoolName = "schooltestbd"
-schoolPass = "876543"
+schoolPass = "87654321"
