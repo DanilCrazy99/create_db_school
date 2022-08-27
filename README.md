@@ -1,5 +1,9 @@
 # create_db_school
-Для работы с файлом Create Database/Create_database.py необходимо ввести в файле Variables/Var_database:
+Для работы с файлом Create Database/Create_database.py необходимо установить библиотеку psycopg2
+
+    pip install psycopg2-binary
+
+и ввести все переменные в файле Variables/Var_database:
 	
 * database = "postgres" 
 * user = "" #имя пользователя кто будет создавать базу данных, пользователя, таблицы
@@ -14,3 +18,7 @@
 Для работы с файлом vk_create_group.py необходима установка библиотеки vk-api:
 	
 	python3 -m pip install vk_api
+
+После установки нужно ввести все переменные в файле Variables/Var_community.py
+
+* vk_token  #токен пользователя от чьего имени будет создаваться сообщество
