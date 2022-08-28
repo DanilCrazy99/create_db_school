@@ -3,6 +3,7 @@ from Variables.Var_community import vk_token, title, description, type, user_id
 
 session = vk_api.VkApi(token=vk_token)
 vk = session.get_api()
+anti_reply_name_group = 1
 
 
 def create_group():
@@ -27,19 +28,19 @@ def get_list_groups(var_user_id):
 
 
 def check_duplicate_group():
-    for i in range(len((values_groups[1]))):
-        items_first_group = values_groups['items'][1]
-        print(i, items_first_group['name'])
+    for i in range(len(items_groups)):
+        items_current_group = items_groups[i]
+        if title == items_current_group['name']:
+            print('Капец. Группа с таким названием уже существует')
+            return 0
     else:
         return 1
 
 
-values_groups = get_list_groups(user_id)
-# [0] = count groups
-# [1] = items groups
-counts_groups = values_groups[0]
-items_groups = values_groups[1]
-# items_groups[1] значения первой группы
-items_first_group = items_groups[1]
+values_groups = get_list_groups(user_id)  # запрос листа групп от API
+counts_groups = values_groups[0]  # [0] = count groups
+items_groups = values_groups[1]  # [1] = items groups
+items_first_group = items_groups[1]  # items_groups[1] значения первой группы
 print(items_first_group['name'])
-
+print(len(items_groups))
+print('функция вернула:' + str(check_duplicate_group()))
