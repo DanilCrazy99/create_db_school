@@ -1,5 +1,5 @@
 import psycopg2
-from Names import database, user, password, host, port, schoolName, schoolPass
+from Variables.Var_database import database, user, password, host, port, schoolName, schoolPass
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 
