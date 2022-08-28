@@ -1,4 +1,4 @@
-from token import token
+from Variables.token import token
 vk_token = token
 user_id = '740705763'
 
