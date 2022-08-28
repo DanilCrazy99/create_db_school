@@ -3,7 +3,6 @@ from Variables.Var_community import vk_token, title, description, type, user_id
 
 session = vk_api.VkApi(token=vk_token)
 vk = session.get_api()
-anti_reply_name_group = 1
 
 
 def create_group():
@@ -41,6 +40,10 @@ values_groups = get_list_groups(user_id)  # запрос листа групп �
 counts_groups = values_groups[0]  # [0] = count groups
 items_groups = values_groups[1]  # [1] = items groups
 items_first_group = items_groups[1]  # items_groups[1] значения первой группы
-print(items_first_group['name'])
-print(len(items_groups))
 print('функция вернула:' + str(check_duplicate_group()))
+if check_duplicate_group() == 1:
+    print('Я выполнил основной блок')
+    create_group()
+else:
+    print('Что-то пошло не так. Скорее всего это название\n'
+    'уже есть и его нужно поменять на другое')
