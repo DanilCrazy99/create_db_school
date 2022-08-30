@@ -41,7 +41,7 @@ counts_groups = values_groups[0]  # [0] = count groups
 items_groups = values_groups[1]  # [1] = items groups
 items_first_group = items_groups[1]  # items_groups[1] значения первой группы
 check_group = check_duplicate_group()
-print('функция вернула:', check_group)
+print('Функция check_duplicate_group вернула:', check_group)
 if check_group == 1:
     print('Я выполнил основной блок')
     create_group()
