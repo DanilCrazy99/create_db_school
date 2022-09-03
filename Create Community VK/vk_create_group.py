@@ -1,15 +1,23 @@
 import vk_api
+import logging
 from Variables.Var_community import vk_token, title, description, type, user_id
 
+logging.basicConfig(filename='log.log', level='DEBUG', encoding='utf-8',
+                    format='%(asctime)s::%(levelname)s:%(message)s')
 session = vk_api.VkApi(token=vk_token)
 vk = session.get_api()
 
 
 def create_group():
-    vk.groups.create(title=title, description=description, type=type)
+    try:
+        vk.groups.create(title=title, description=description, type=type)
+    except Exception:
+        logging.error('Введены не те данные для создания группы:%s', Exception)
 
 
 def get_list_groups(var_user_id):
+    logging.debug('Проверка листа групп администратора, переменные\n'
+                  '1)ID пользователя:%s', var_user_id)
     list_groups = vk.groups.get(user_id=var_user_id, extended=1, filter='admin', fields='name')
     count_groups = list_groups['count']
     # print(count_groups)
