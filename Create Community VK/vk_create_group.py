@@ -3,7 +3,8 @@ import logging
 from Variables.Var_community import vk_token, title, description, type_community, user_id
 
 logging.basicConfig(filename='log.log', level='DEBUG', encoding='utf-8',
-                    format='%(asctime)s::%(levelname)s:%(message)s')
+                    format='%(asctime)s:%(levelname)s:Строка-'
+                           '%(lineno)d:%(message)s')
 logging.info('\nНачало работы программы')
 
 try:
@@ -16,7 +17,10 @@ except Exception:
 def create_group():
     try:
         vk.groups.create(title=title, description=description, type=type_community)
+        print('Новая группа создана')
+        logging.info('Новая группа создана')
     except Exception:
+        print('Ошибка при создании группы')
         logging.error('Введены не те данные для создания группы:%s', Exception)
 
 
@@ -50,8 +54,6 @@ check_group = check_duplicate_group()
 logging.debug('Функция check_duplicate_group вернула: %d', check_group)
 if check_group == 1:
     create_group()
-    print('Новая группа создана')
-    logging.info('Новая группа создана')
 else:
     pass
 
