@@ -1,0 +1,49 @@
+{
+  "one_time": false,
+  "inline": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "open_link",
+          "link": "http://www.izhplast.com",
+          "label": "Перейти на сайт",
+          "payload": {
+            "type": "open_link",
+            "link": "http://www.izhplast.com"
+          }
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "скрыть клав-у"
+        },
+        "color": "primary"
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "/price"
+        },
+        "color": "negative"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "/режим работы"
+        },
+        "color": "positive"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "/телефон"
+        },
+        "color": "positive"
+      }
+    ]
+  ]
+}
