@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from Variables.token import token
 vk_token = token
 user_id = '740705763'
