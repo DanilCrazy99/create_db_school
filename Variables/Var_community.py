@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from Variables.token import token
+from Variables.token import token, user_admin
 vk_token = token
-user_id = '740705763'
+user_id = user_admin
+path_logFile = "logs/log.log"
 
 # Переменные для создания сообщества
 title = 'Опять прогаю'
