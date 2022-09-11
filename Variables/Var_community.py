@@ -5,7 +5,7 @@ from Variables.token import token_admin
 user_admin = '740705763'
 group_id = '215601456'
 vk_token = token_admin
-path_logFile = "logs/logs.logs"
+path_logFile = "log.log"
 
 # Переменные для создания сообщества
 title = 'Опять прогаю'
