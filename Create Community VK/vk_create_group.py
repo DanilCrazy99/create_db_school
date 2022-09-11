@@ -1,6 +1,6 @@
 import vk_api
 import logging
-from Variables.Var_community import vk_token, title, description, type_community, user_id
+from Variables.Var_community import vk_token, title, description, type_community, user_admin
 
 logging.basicConfig(filename='logs.logs', level='DEBUG', encoding='utf-8',
                     format='%(asctime)s:%(levelname)s:Строка-'
@@ -44,7 +44,7 @@ def check_duplicate_group():
 
 
 try:
-    values_groups = get_list_groups(user_id)  # запрос листа групп от API
+    values_groups = get_list_groups(user_admin)  # запрос листа групп от API
 except Exception as Er:
     logging.error('Произошла ошибка во время считывания листа групп администратора: %s', Er)
 counts_groups = values_groups[0]  # [0] = count groups
