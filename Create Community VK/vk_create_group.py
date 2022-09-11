@@ -2,7 +2,7 @@ import vk_api
 import logging
 from Variables.Var_community import vk_token, title, description, type_community, user_id
 
-logging.basicConfig(filename='log.log', level='DEBUG', encoding='utf-8',
+logging.basicConfig(filename='logs.logs', level='DEBUG', encoding='utf-8',
                     format='%(asctime)s:%(levelname)s:Строка-'
                            '%(lineno)d:%(message)s')
 logging.info('\nНачало работы программы')
