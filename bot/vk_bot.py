@@ -10,6 +10,7 @@ import traceback
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from Variables.token import token_group
 from Variables.Var_community import group_id
+from bot.keyboard import Keyboards
 
 
 class MyLongPoll(VkBotLongPoll):
@@ -36,6 +37,9 @@ class VkBot:
 
         # для использования методов VK
         self.vk_api = self.vk.get_api()
+        self.from_id = 0
+        self.new_msg = ''
+        self.kb = Keyboards()
 
      # отправка сообщения пользователю (+ вложение + клавиатура)
     def send_msg(self, message, attachment: list = [], keyboard=None):
@@ -43,8 +47,13 @@ class VkBot:
         parameters = {'message': message,
                       'keyboard': keyboard,
                       'attachment': attachment,
-                      'random_id': 0}
+                      'random_id': 0}# личное сообщение
+        parameters.update({'user_id': self.from_id})
         self.vk.method('messages.send', parameters)
+
+    def correct_msg(self, msg):
+        tmp_str = msg.lower()
+        return tmp_str
 
 
     def start(self):
@@ -53,6 +62,16 @@ class VkBot:
         try:
             for event in self.long_poll.listen():
                  print('входное сообщение: ', event)
+
+                 # обработка поступившего личного сообщения
+                 if event.type == VkBotEventType.MESSAGE_NEW:
+                    self.new_msg = self.correct_msg(event.obj['message']['text'])
+                    # кто отправил сообщение
+                    self.from_id = event.obj['message']['from_id']
+                    kbd = ''
+                    self.send_msg('Мы получили от вас сообщение', keyboard=self.kb.get_keyboard('main'))
+
+
 
         except requests.exceptions.ReadTimeout:
             error_msg = traceback.format_exc()
