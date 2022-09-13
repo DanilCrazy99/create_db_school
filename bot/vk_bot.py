@@ -68,8 +68,13 @@ class VkBot:
                     self.new_msg = self.correct_msg(event.obj['message']['text'])
                     # кто отправил сообщение
                     self.from_id = event.obj['message']['from_id']
-                    kbd = ''
-                    self.send_msg('Мы получили от вас сообщение', keyboard=self.kb.get_keyboard('main'))
+                    if self.new_msg == 'расписание на ...':
+                        self.send_msg('за какой период хотите узнать расписание?', keyboard=self.kb.get_keyboard('main'))
+                    elif self.new_msg == '/сегодня':
+                        self.send_msg('расписание на сегодня: '
+                                      '\n вт. '
+                                      '\n1 - математика'
+                                      '\n2 - русский', keyboard=self.kb.get_keyboard('main'))
 
 
 
