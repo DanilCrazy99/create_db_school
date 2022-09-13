@@ -5,42 +5,31 @@
     [
       {
         "action": {
-          "type": "open_link",
-          "link": "http://www.izhplast.com",
-          "label": "Перейти на сайт",
-          "payload": {
-            "type": "open_link",
-            "link": "http://www.izhplast.com"
-          }
-        }
-      },
-      {
-        "action": {
           "type": "text",
-          "label": "скрыть клав-у"
+          "label": "Расписание на ..."
         },
-        "color": "primary"
+        "color": "secondary"
       }
     ],
     [
       {
         "action": {
           "type": "text",
-          "label": "/price"
+          "label": "/сегодня"
         },
-        "color": "negative"
+        "color": "primary"
       },
       {
         "action": {
           "type": "text",
-          "label": "/режим работы"
+          "label": "/завтра"
         },
         "color": "positive"
       },
       {
         "action": {
           "type": "text",
-          "label": "/телефон"
+          "label": "/неделя"
         },
         "color": "positive"
       }
