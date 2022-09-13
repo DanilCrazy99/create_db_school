@@ -71,8 +71,9 @@ class VkBot:
                     if self.new_msg == 'расписание на ...':
                         self.send_msg('за какой период хотите узнать расписание?', keyboard=self.kb.get_keyboard('main'))
                     elif self.new_msg == '/сегодня':
+                        tt = time.strftime('%A %d %B %Y', time.localtime())
                         self.send_msg('расписание на сегодня: '
-                                      '\n вт. '
+                                      f'\n{tt}'
                                       '\n1 - математика'
                                       '\n2 - русский', keyboard=self.kb.get_keyboard('main'))
 
