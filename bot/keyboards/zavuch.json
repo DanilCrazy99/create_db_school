@@ -1,0 +1,38 @@
+{
+  "one_time": false,
+  "inline": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Расписание"
+        },
+        "color": "secondary"
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "/загрузить"
+        },
+        "color": "primary"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "/скачать"
+        },
+        "color": "positive"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "/удалить"
+        },
+        "color": "negative"
+      }
+    ]
+  ]
+}
