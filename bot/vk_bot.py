@@ -37,6 +37,16 @@ class VkBot:
         # для использования методов VK
         self.vk_api = self.vk.get_api()
 
+     # отправка сообщения пользователю (+ вложение + клавиатура)
+    def send_msg(self, message, attachment: list = [], keyboard=None):
+        # print('отправка лс')
+        parameters = {'message': message,
+                      'keyboard': keyboard,
+                      'attachment': attachment,
+                      'random_id': 0}
+        self.vk.method('messages.send', parameters)
+
+
     def start(self):
         logging.info('Запущен основной цикл бота')
 
