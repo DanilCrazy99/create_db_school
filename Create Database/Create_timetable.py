@@ -14,17 +14,27 @@ for columns_name_class in range(3, sheet.max_column):  # Получаю спис
 
 for columns in range(3, sheet.max_column):  # переборка по координате "буква"
     for rows in range(3, 52):  # переборка по координате "цифра"
+        day_week_val = int(rows/8)
+        day_week = sheet[4 + day_week_val * 8][0].value
         if sheet[rows][columns].value:  # Если выбранная ячейка содержит данные
-            for a in list_class:  # Переборка классов из листа list_class
-                if a in sheet[rows][columns].value:  # Если класс встретился при переборе таблицы
-                    name_class = a
-                    for i in range(7):  # Записываем 7 строк под ним
-                        if sheet[rows + i + 1][columns].value is None:  # Убираю значения None из списков
-                            list_lessons.append(f'{name_class}._')
-                        else:
-                            list_lessons.append(name_class + '.' + str(sheet[rows + i + 1][1].value)[0] + '.' + sheet[rows + i + 1][columns].value)
-                        if i == 6:
-                            list_lessons.append(f'{name_class}._')
+            if sheet[rows][columns].value in list_class:  # Значение ячейки есть в списке с классами
+                name_class = sheet[rows][columns].value
+
+                for i in range(7):  # Записываем 7 строк под ним
+                    if sheet[rows + i + 1][columns].value is None:  # Убираю значения None из списков
+                        list_lessons.append(f'{name_class}Y_')
+                    else:
+                        lesson_cell_coordinate_number = rows + i + 1
+                        list_lessons.append(str(name_class) +
+                                            'Y' +
+                                            str(sheet[lesson_cell_coordinate_number][1].value)[0] +
+                                            'Y' +
+                                            str(sheet[rows + i + 1][columns].value) +
+                                            'Y' +
+                                            str(day_week)
+                                            )
+                    if i == 6:
+                        list_lessons.append(f'{name_class}Y_')
 
 print(list_class)
 print(list_lessons)
