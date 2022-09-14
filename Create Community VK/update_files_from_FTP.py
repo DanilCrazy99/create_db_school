@@ -4,6 +4,7 @@ from Variables.Var_community import main_path, host, user, passwd
 
 ftp = FTP(host=host)  # Авторизация на FTP сервере
 
+
 def iteration_list_folder(path_folder):
     path_in_def = path_folder
     list_in_folder = []
@@ -39,8 +40,10 @@ def include_files(list_files, path_file):
 try:
     ftp.login(user=user, passwd=passwd)
     ftp.cwd('school17')
+    iteration_list_folder(main_path)
 except Exception:
-    pass
-
-iteration_list_folder(main_path)
+    ftp.quit()
+except KeyboardInterrupt:
+    ftp.quit()
 ftp.quit()
+
