@@ -68,6 +68,11 @@ class VkBot:
                     self.new_msg = self.correct_msg(event.obj['message']['text'])
                     # кто отправил сообщение
                     self.from_id = event.obj['message']['from_id']
+
+                    if self.from_id < 0:
+                        # прерываем если пришло сообщение от группы
+                        continue
+
                     if self.new_msg == 'расписание на ...':
                         self.send_msg('за какой период хотите узнать расписание?', keyboard=self.kb.get_keyboard('main'))
                     elif self.new_msg == '/сегодня':
@@ -76,6 +81,14 @@ class VkBot:
                                       f'\n{tt}'
                                       '\n1 - математика'
                                       '\n2 - русский', keyboard=self.kb.get_keyboard('main'))
+                    elif self.new_msg == '/завтра':
+                        tt = time.strftime('%A %d %B %Y', time.localtime())
+                        self.send_msg('расписание на завтра: '
+                                      f'\n{tt}'
+                                      '\n1 - ин-яз(анг)'
+                                      '\n2 - литература', keyboard=self.kb.get_keyboard('main'))
+                    else:
+                        self.send_msg('Ваша команда не распознана.\nВоспользуйтесь клавиатурой.', keyboard=self.kb.get_keyboard('main'))
 
 
 
