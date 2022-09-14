@@ -11,8 +11,8 @@ try:
     )
     with connection.cursor() as cursor:
         cursor.execute(
-                        "INSERT INTO таблица_с_расписанием (id, класс, урок(время), предмет, день недели, "
-                        f"время(актуализации), ответственный) VALUES ({массив})"
+                        "INSERT INTO таблица_с_расписанием (класс, урок(время), предмет, день недели, "
+                        f"ответственный) VALUES ({массив})"
                         )
 
 except Exception as _ex:
