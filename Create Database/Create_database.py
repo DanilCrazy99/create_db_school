@@ -113,21 +113,21 @@ def program_case(case_value):
 
 def db_main_tables(cursor):
     cursor.execute("CREATE TABLE IF NOT EXISTS academic_discipline(\
-        id integer NOT NULL PRIMARY KEY,\
+        id bigserial NOT NULL PRIMARY KEY,\
         name text NOT NULL,\
         room_id int NOT NULL DEFAULT 0\
         );"
                    )
 
     cursor.execute("CREATE TABLE IF NOT EXISTS add_education(\
-        id integer NOT NULL,\
+        id bigserial NOT NULL,\
         name_education text NOT NULL PRIMARY KEY,\
         price money DEFAULT 0\
         );"
                    )
 
     cursor.execute("CREATE TABLE IF NOT EXISTS learner(\
-        id integer NOT NULL PRIMARY KEY,\
+        id bigserial NOT NULL PRIMARY KEY,\
         name text NOT NULL,\
         surname text,\
         phone integer\
@@ -135,14 +135,14 @@ def db_main_tables(cursor):
                    )
 
     cursor.execute("CREATE TABLE IF NOT EXISTS role(\
-        id integer NOT NULL PRIMARY KEY,\
+        id bigserial NOT NULL PRIMARY KEY,\
         role text NOT NULL,\
         description text\
         );"
                    )
 
     cursor.execute("CREATE TABLE IF NOT EXISTS room_school(\
-        id integer NOT NULL PRIMARY KEY,\
+        id bigserial NOT NULL PRIMARY KEY,\
         liter_number text NOT NULL,\
         discipline_id integer DEFAULT 0\
         );"
@@ -150,7 +150,7 @@ def db_main_tables(cursor):
 
     # Таблица student_parent/родители учеников (id, id ученика, имя, фамилия, отчество, телефон, доп информация)
     cursor.execute("CREATE TABLE IF NOT EXISTS student_parent(\
-        id integer NOT NULL PRIMARY KEY, \
+        id bigserial NOT NULL PRIMARY KEY, \
         learner_id integer DEFAULT 0,\
         name text NOT NULL, \
         surname text, \
@@ -162,7 +162,7 @@ def db_main_tables(cursor):
 
     # Таблица teacher/учителя(id, имя, отчество, фамилия, телефон)
     cursor.execute("CREATE TABLE IF NOT EXISTS teacher(\
-         id integer NOT NULL PRIMARY KEY,\
+         id bigserial NOT NULL PRIMARY KEY,\
          name text NOT NULL,\
          patronymic text,\
          surname text,\
@@ -172,7 +172,7 @@ def db_main_tables(cursor):
 
     # Таблица vacation_schedule/отгулы,отпуски
     cursor.execute("CREATE TABLE IF NOT EXISTS vacation_schedule(\
-        id integer NOT NULL,\
+        id bigserial NOT NULL,\
         teacher_id integer NOT NULL PRIMARY KEY,\
         start_date date,\
         stop_date date,\
@@ -182,16 +182,27 @@ def db_main_tables(cursor):
 
     # Таблица vacation_type/тип отгулов,отпусков
     cursor.execute("CREATE TABLE IF NOT EXISTS vacation_type(\
-        id integer NOT NULL PRIMARY KEY,\
+        id bigserial NOT NULL PRIMARY KEY,\
         description text\
         );"
+                   )
+
+    # Таблица timetable/расписание
+    cursor.execute("CREATE TABLE IF NOT EXISTS timetable(\
+        id bigserial NOT NULL PRIMARY KEY,\
+        class text NOT NULL,\
+        lesson_number integer NOT NULL,\
+        academic_discipline text NOT NULL,\
+        day_of_week text NOT NULL,\
+        editor text DEFAULT 'admin',\
+        time_update timestamp without time zone DEFAULT CURRENT_TIMESTAMP);"
                    )
 
 
 def db_not_main_tables(cursor):
     # Таблица settings(уточняется)
     cursor.execute("CREATE TABLE IF NOT EXISTS settings(\
-        id integer NOT NULL PRIMARY KEY,\
+        id bigserial NOT NULL PRIMARY KEY,\
         name text NOT NULL,\
         value text,\
         description text\
@@ -199,14 +210,14 @@ def db_not_main_tables(cursor):
                    )
     # Таблица special_room(уточняется)
     cursor.execute("CREATE TABLE IF NOT EXISTS special_room(\
-        id integer NOT NULL PRIMARY KEY,\
+        id bigserial NOT NULL PRIMARY KEY,\
         name text NOT NULL,\
         class_room_id integer NOT NULL DEFAULT 0\
         );"
                    )
     # Таблица users
     cursor.execute("CREATE TABLE IF NOT EXISTS users(\
-        id integer NOT NULL PRIMARY KEY,\
+        id bigserial NOT NULL PRIMARY KEY,\
         user_id_vk integer NOT NULL,\
         role_id integer DEFAULT 1,\
         invitation_sent boolean NOT NULL DEFAULT false,\
