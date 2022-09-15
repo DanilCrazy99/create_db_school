@@ -50,4 +50,4 @@ def create_postgres_list(list_func):
     return completed_list
 
 
-create_postgres_list(create_timetable_list(path_timetable))
+print(create_postgres_list(create_timetable_list(path_timetable)))

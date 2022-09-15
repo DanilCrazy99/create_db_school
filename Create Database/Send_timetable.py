@@ -19,6 +19,7 @@ try:
                            "editor) "
                           f"VALUES ({completed_list[a]})"
                             )
+            cursor.commit()
 
 except Exception as _ex:
     print("[INFO] Error while working with PostgreSQL", _ex)
