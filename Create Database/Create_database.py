@@ -1,12 +1,12 @@
 import psycopg2
-from Variables.Var_database import database, user, password, host, port, schoolName, schoolPass
+from Variables.Var_database import main_database, user, password, host, port, schoolName, schoolPass
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 
 def create_database_school():
     try:
         connection = psycopg2.connect(
-            database=database,
+            database=main_database,
             user=user,
             password=password,
             host=host,

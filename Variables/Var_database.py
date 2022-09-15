@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-database = 'postgres'
+main_database = 'postgres'
 user = ''
 password = ''
 host = 'localhost'
