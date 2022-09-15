@@ -22,3 +22,8 @@
 После установки нужно ввести все переменные в файле Variables/Var_community.py
 
 * vk_token  #токен пользователя от чьего имени будет создаваться сообщество
+
+Для работы с файлом Send_timetable нужна библиотека openpylx
+
+	pip install openpyxl
+	
