@@ -12,12 +12,12 @@ try:
     completed_list = Create_timetable.create_postgres_list(Create_timetable.create_timetable_list(path_timetable))
     for a in range(len(completed_list)):
         with connection.cursor() as cursor:
-            cursor.execute('INSERT INTO timetable (class, '
-                           'lesson_number, '
-                           'academic_discipline, '
-                           'day_of_week, '
-                           'editor) '
-                          f'VALUES ("{completed_list[a]}")'
+            cursor.execute("INSERT INTO timetable (class, "
+                           "lesson_number, "
+                           "academic_discipline, "
+                           "day_of_week, "
+                           "editor) "
+                          f"VALUES ('{completed_list[a]}')"
                             )
             cursor.commit()
 
