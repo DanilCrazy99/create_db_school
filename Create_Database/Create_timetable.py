@@ -49,5 +49,8 @@ def create_postgres_list(list_func):
             completed_list.append(list_func[a])
     return completed_list
 
+# К примеру было ['5А, 1, Русский, Понедельник, Петухова М.В', '5А, 2, Литература, Понедельник, Петухова М.В']
+# Стало [[5А], [1], [Русский], [Понедельник], [Петухова М.В], [5А], [2], [Литература], [Понедельник], [Петухова М.В]]
 
-print(create_postgres_list(create_timetable_list(path_timetable)))
+
+print(create_timetable_list(path_timetable)[0][0])
