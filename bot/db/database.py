@@ -19,7 +19,7 @@ class DataBase:
         )
         self.__cursor = self.__connect.cursor()
 
-    def select_timetable_klass(self, ):
+    def select_timetable_class(self):
         sql = 'SELECT id, class, lesson_number, academic_discipline, day_of_week, editor, time_update FROM timetable;'
         self.__cursor.execute(sql)
         result = self.__cursor.fetchall()
