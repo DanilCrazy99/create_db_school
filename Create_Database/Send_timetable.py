@@ -23,8 +23,7 @@ try:
                            "editor) "
                            f"VALUES ({without_brackets})"
                            )
-            cursor.commit()
-
+    connection.commit()
 except Exception as _ex:
     print("[INFO] Error while working with PostgreSQL", _ex)
 finally:
