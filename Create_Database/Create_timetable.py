@@ -47,5 +47,6 @@ def create_postgres_list(list_func):
     return completed_list
 
 
-print(create_postgres_list(create_timetable_list(path_timetable)))
-
+# test_mass = create_postgres_list(create_timetable_list(path_timetable))
+# for a in range(len(test_mass)):
+#     print(test_mass[a])

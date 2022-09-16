@@ -12,16 +12,18 @@ try:
     )
     completed_list = Create_timetable.create_postgres_list(Create_timetable.create_timetable_list(path_timetable))
     for a in range(len(completed_list)):
-        for b in range(len(completed_list[a])):
-            with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO timetable (class, "
-                               "lesson_number, "
-                               "academic_discipline, "
-                               "day_of_week, "
-                               "editor) "
-                               f"VALUES ('{completed_list[a][b]}')"
-                               )
-                cursor.commit()
+        without_brackets = str(completed_list[a])
+        without_brackets = without_brackets[:len(without_brackets)-1]
+        without_brackets = without_brackets[1:]
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO timetable (class, "
+                           "lesson_number, "
+                           "academic_discipline, "
+                           "day_of_week, "
+                           "editor) "
+                           f"VALUES ('{without_brackets}')"
+                           )
+            cursor.commit()
 
 except Exception as _ex:
     print("[INFO] Error while working with PostgreSQL", _ex)
