@@ -46,4 +46,5 @@ def create_postgres_list(list_func):
             completed_list.append(list_func[a])
     return completed_list
 
+
 print(create_timetable_list(path_timetable)[0])
