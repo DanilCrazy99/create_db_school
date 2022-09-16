@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 main_database = 'postgres'
-user = ''
-password = ''
+user = 'sergey'
+password = '5482173'
 host = 'localhost'
 port = 5432
 schoolName = 'schooltestbd'

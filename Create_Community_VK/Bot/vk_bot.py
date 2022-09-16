@@ -59,11 +59,11 @@ class VkBot:
         tmp_str = msg.lower()
         return tmp_str
 
-    def create_msg_table(self, class_letter=['5А', '5Б'], week_day=['Вторник', 'Понедельник']):
+    def create_msg_table(self, class_letter=['5Б'], week_day=['Вторник']):
         data_timetable = self.db.select_timetable_class(class_letter=class_letter, week_day=week_day)
         str_table = ''
         for data_week in data_timetable:
-            str_table = '\n' + data_week[2]  # номер урока
+            str_table += '\n' + str(data_week[2])  # номер урока
             str_table += ' - ' + data_week[3]  # предмет
         return str_table
 
@@ -89,7 +89,7 @@ class VkBot:
                                       ' расписание?', keyboard=self.kb.get_keyboard('main'))
                     elif self.new_msg == '/пн':
                         tt = time.strftime('%A %d %B %Y', time.localtime())
-                        self.send_msg('расписание на сегодня: '
+                        self.send_msg('расписание на пн: '
                                       f'\n{tt}' + self.create_msg_table(),
                                       keyboard=self.kb.get_keyboard('main'))
                     elif self.new_msg == '/вт':
