@@ -57,36 +57,51 @@ class VkBot:
         return tmp_str
 
 
-def start(self):
-    logging.info('Запущен основной цикл бота')
+    def start(self):
+        logging.info('Запущен основной цикл бота')
 
-    try:
-        for event in self.long_poll.listen():
-            print('входное сообщение: ', event)
+        try:
+            for event in self.long_poll.listen():
+                 print('входное сообщение: ', event)
 
-            # обработка поступившего личного сообщения
-            if event.type == VkBotEventType.MESSAGE_NEW:
-                self.new_msg = self.correct_msg(event.obj['message']['text'])
-                # кто отправил сообщение
-                self.from_id = event.obj['message']['from_id']
-                if self.new_msg == 'расписание на ...':
-                    self.send_msg('за какой период хотите узнать расписание?', keyboard=self.kb.get_keyboard('main'))
-                elif self.new_msg == '/сегодня':
-                    tt = time.strftime('%A %d %B %Y', time.localtime())
-                    self.send_msg('расписание на сегодня: '
-                                  f'\n{tt}'
-                                  '\n1 - математика'
-                                  '\n2 - русский', keyboard=self.kb.get_keyboard('main'))
+                 # обработка поступившего личного сообщения
+                 if event.type == VkBotEventType.MESSAGE_NEW:
+                    self.new_msg = self.correct_msg(event.obj['message']['text'])
+                    # кто отправил сообщение
+                    self.from_id = event.obj['message']['from_id']
 
-    except requests.exceptions.ReadTimeout:
-        error_msg = traceback.format_exc()
-        logging.error(f'ошибка подключения: {error_msg}')
-        time.sleep(10)
+                    if self.from_id < 0:
+                        # прерываем если пришло сообщение от группы
+                        continue
 
-    except Exception:
-        error_msg = traceback.format_exc()
-        # print(f'Произошла ошибка в файле бота:\n    {error_msg}\nПерезапуск...')
-        logging.info('источник краша...')
-        logging.error(f'Произошла ошибка в файле бота:{error_msg}')
-        logging.info('Перезапуск...')
-        time.sleep(5)
+                    if self.new_msg == 'расписание на ...':
+                        self.send_msg('за какой период хотите узнать расписание?', keyboard=self.kb.get_keyboard('main'))
+                    elif self.new_msg == '/пн':
+                        tt = time.strftime('%A %d %B %Y', time.localtime())
+                        self.send_msg('расписание на сегодня: '
+                                      f'\n{tt}'
+                                      '\n1 - математика'
+                                      '\n2 - русский', keyboard=self.kb.get_keyboard('main'))
+                    elif self.new_msg == '/вт':
+                        tt = time.strftime('%A %d %B %Y', time.localtime())
+                        self.send_msg('расписание на завтра: '
+                                      f'\n{tt}'
+                                      '\n1 - ин-яз(анг)'
+                                      '\n2 - литература', keyboard=self.kb.get_keyboard('main'))
+                    else:
+                        self.send_msg('Ваша команда не распознана.\nВоспользуйтесь клавиатурой.', keyboard=self.kb.get_keyboard('main'))
+
+
+
+        except requests.exceptions.ReadTimeout:
+            error_msg = traceback.format_exc()
+            logging.error(f'ошибка подключения: {error_msg}')
+            time.sleep(10)
+
+        except Exception:
+            error_msg = traceback.format_exc()
+            # print(f'Произошла ошибка в файле бота:\n    {error_msg}\nПерезапуск...')
+            logging.info(f'источник краша...')
+            logging.error(f'Произошла ошибка в файле бота:{error_msg}')
+            logging.info('Перезапуск...')
+            time.sleep(5)
