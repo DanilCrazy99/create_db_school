@@ -56,16 +56,14 @@ class VkBot:
         tmp_str = msg.lower()
         return tmp_str
 
-
     def start(self):
         logging.info('Запущен основной цикл бота')
 
         try:
             for event in self.long_poll.listen():
-                 print('входное сообщение: ', event)
-
-                 # обработка поступившего личного сообщения
-                 if event.type == VkBotEventType.MESSAGE_NEW:
+                print('входное сообщение: ', event)
+                # обработка поступившего личного сообщения
+                if event.type == VkBotEventType.MESSAGE_NEW:
                     self.new_msg = self.correct_msg(event.obj['message']['text'])
                     # кто отправил сообщение
                     self.from_id = event.obj['message']['from_id']
@@ -75,7 +73,8 @@ class VkBot:
                         continue
 
                     if self.new_msg == 'расписание на ...':
-                        self.send_msg('за какой период хотите узнать расписание?', keyboard=self.kb.get_keyboard('main'))
+                        self.send_msg('за какой период хотите узнать'
+                                      ' расписание?', keyboard=self.kb.get_keyboard('main'))
                     elif self.new_msg == '/пн':
                         tt = time.strftime('%A %d %B %Y', time.localtime())
                         self.send_msg('расписание на сегодня: '
@@ -89,9 +88,8 @@ class VkBot:
                                       '\n1 - ин-яз(анг)'
                                       '\n2 - литература', keyboard=self.kb.get_keyboard('main'))
                     else:
-                        self.send_msg('Ваша команда не распознана.\nВоспользуйтесь клавиатурой.', keyboard=self.kb.get_keyboard('main'))
-
-
+                        self.send_msg('Ваша команда не распознана.\nВоспользуйтесь'
+                                      ' клавиатурой.', keyboard=self.kb.get_keyboard('main'))
 
         except requests.exceptions.ReadTimeout:
             error_msg = traceback.format_exc()
