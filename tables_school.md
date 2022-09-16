@@ -63,6 +63,15 @@
 * id bigserial NOT NULL PRIMARY KEY,
 * description text
 
+### Таблица timetable/расписание уроков
+* id bigserial NOT NULL PRIMARY KEY,
+* class text NOT NULL,
+* lesson_number integer NOT NULL,
+* academic_discipline text NOT NULL,
+* day_of_week text NOT NULL,
+* editor text DEFAULT 'admin',
+* time_update timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+
 ### Таблица users
 * id bigserial NOT NULL PRIMARY KEY,
 * user_id_vk integer NOT NULL,
