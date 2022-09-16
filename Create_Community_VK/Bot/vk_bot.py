@@ -11,6 +11,7 @@ from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from Create_Community_VK.Config.token import token_group
 from Create_Community_VK.Config.Var_community import group_id
 from Create_Community_VK.Bot.keyboard import Keyboards
+from Create_Community_VK.Bot.db.database import DataBase
 
 
 class MyLongPoll(VkBotLongPoll):
@@ -38,9 +39,11 @@ class VkBot:
 
         # для использования методов VK
         self.vk_api = self.vk.get_api()
+
         self.from_id = 0
         self.new_msg = ''
         self.kb = Keyboards()
+        self.db = DataBase()
 
 # Отправка сообщения пользователю (+ вложение + клавиатура)
     def send_msg(self, message, attachment: list = [], keyboard=None):
@@ -55,6 +58,15 @@ class VkBot:
     def correct_msg(self, msg):
         tmp_str = msg.lower()
         return tmp_str
+
+    def create_msg_table(self, class_letter=['5А', '5Б'], week_day=['Вторник', 'Понедельник']):
+        data_timetable = self.db.select_timetable_class(class_letter=class_letter, week_day=week_day)
+        str_table = ''
+        for data_week in data_timetable:
+            str_table = '\n' + data_week[2]  # номер урока
+            str_table += ' - ' + data_week[3]  # предмет
+        return str_table
+
 
     def start(self):
         logging.info('Запущен основной цикл бота')
@@ -78,9 +90,8 @@ class VkBot:
                     elif self.new_msg == '/пн':
                         tt = time.strftime('%A %d %B %Y', time.localtime())
                         self.send_msg('расписание на сегодня: '
-                                      f'\n{tt}'
-                                      '\n1 - математика'
-                                      '\n2 - русский', keyboard=self.kb.get_keyboard('main'))
+                                      f'\n{tt}' + self.create_msg_table(),
+                                      keyboard=self.kb.get_keyboard('main'))
                     elif self.new_msg == '/вт':
                         tt = time.strftime('%A %d %B %Y', time.localtime())
                         self.send_msg('расписание на завтра: '

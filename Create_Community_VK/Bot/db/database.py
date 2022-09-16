@@ -29,7 +29,7 @@ class DataBase:
         sql = "SELECT id, class, lesson_number, academic_discipline, day_of_week, editor, time_update " \
               f"FROM timetable WHERE ({sql_class_letter}) AND ({sql_week}) " \
               "ORDER BY class, day_of_week, lesson_number ASC ;"
-        print('sql= ', sql)
+
         self.__cursor.execute(sql)
         result = self.__cursor.fetchall()
         return result
