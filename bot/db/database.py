@@ -2,11 +2,9 @@
 
 # файл для работы с бд Postgresql
 import psycopg2
-import logging
-import datetime
-import time
 
-from Variables.Var_database import schoolName, user, password, host, port, path_timetable
+from Create_Database.Config.Var_database import schoolName, user, password, host, port
+
 
 class DataBase:
     def __init__(self):

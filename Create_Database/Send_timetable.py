@@ -1,6 +1,6 @@
 import psycopg2
 import Create_timetable
-from Variables.Var_database import schoolName, user, password, host, port, path_timetable
+from Create_Database.Config.Var_database import schoolName, user, password, host, port, path_timetable
 
 try:
     connection = psycopg2.connect(

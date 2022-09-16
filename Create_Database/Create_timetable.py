@@ -1,5 +1,4 @@
 import openpyxl
-from Variables.Var_database import path_timetable
 
 
 def create_timetable_list(path):

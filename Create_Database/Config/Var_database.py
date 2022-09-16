@@ -9,4 +9,4 @@ schoolName = 'schooltestbd'
 schoolPass = '87654321'
 class_school = '1A'
 
-path_timetable = r'../Variables/CopyTimetable.xlsx'
+path_timetable = r'CopyTimetable.xlsx'

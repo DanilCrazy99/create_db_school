@@ -1,6 +1,6 @@
 import vk_api
 import logging
-from Variables.Var_community import vk_token, title, description, type_community, user_admin, path_logFile
+from Create_Community_VK.Config.Var_community import vk_token, title, description, type_community, user_admin, path_logFile
 
 logging.basicConfig(filename=path_logFile, level='DEBUG', encoding='utf-8',
                     format='%(asctime)s:%(levelname)s:Строка-'

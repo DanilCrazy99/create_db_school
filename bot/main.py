@@ -5,7 +5,7 @@ import logging
 import traceback
 
 # подключаем конфигурацию
-from Variables.Var_community import path_logFile
+from Create_Community_VK.Config.Var_community import path_logFile
 from vk_bot import VkBot
 
 # настройка логирования

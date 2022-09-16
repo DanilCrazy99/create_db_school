@@ -8,8 +8,8 @@ import logging
 import traceback
 
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-from Variables.token import token_group
-from Variables.Var_community import group_id
+from Create_Community_VK.Config.token import token_group
+from Create_Community_VK.Config.Var_community import group_id
 from bot.keyboard import Keyboards
 
 
