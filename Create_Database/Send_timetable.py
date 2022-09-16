@@ -21,7 +21,7 @@ try:
                            "academic_discipline, "
                            "day_of_week, "
                            "editor) "
-                           f"VALUES ('{without_brackets}')"
+                           f"VALUES ({without_brackets})"
                            )
             cursor.commit()
 
