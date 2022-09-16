@@ -10,7 +10,7 @@ import traceback
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from Create_Community_VK.Config.token import token_group
 from Create_Community_VK.Config.Var_community import group_id
-from bot.keyboard import Keyboards
+from Create_Community_VK.Bot.keyboard import Keyboards
 
 
 class MyLongPoll(VkBotLongPoll):
