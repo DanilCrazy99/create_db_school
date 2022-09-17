@@ -1,10 +1,9 @@
 import vk_api
 from Create_Community_VK.Config.Var_community import token_group
-from Create_Community_VK.Config.token import token
 
 
 class Community:
-    def __init__(self, token_in_class=token):
+    def __init__(self, token_in_class=token_group):
         # присваиваю переменной token токен группы
         # по дефолту равно токену из конфига
         self.__token = token_in_class
