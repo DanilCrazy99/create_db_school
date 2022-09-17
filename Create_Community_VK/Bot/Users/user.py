@@ -29,9 +29,5 @@ class Community:
             if list_items['items'][a]['conversation']['peer']['type'] == 'chat':
                 list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
         return list_ids
-                            # if 'owner_id': -215601456     type chat
-                         # {'conversation': {'peer': {'id':
-test1 = Community()
-print(test1.get_chats_ids())  # В скобки ввести id беседы
 
 
