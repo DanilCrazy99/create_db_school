@@ -72,6 +72,11 @@
 * editor text DEFAULT 'admin',
 * time_update timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 
+### Таблица bot_messages/сообщения от бота
+* id bigserial NOT NULL PRIMARY KEY,
+* msg text NOT NULL,
+* time timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+
 ### Таблица users
 * id bigserial NOT NULL PRIMARY KEY,
 * user_id_vk integer NOT NULL,

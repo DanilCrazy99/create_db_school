@@ -198,6 +198,14 @@ def db_main_tables(cursor):
         time_update timestamp without time zone DEFAULT CURRENT_TIMESTAMP);"
                    )
 
+    # Таблица bot_messages/сообщения от бота
+    cursor.execute("CREATE TABLE IF NOT EXISTS bot_messages(\
+        id bigserial NOT NULL PRIMARY KEY,\
+        msg text NOT NULL,\
+        id_user_vk integer NOT NULL,\
+        time timestamp without time zone DEFAULT CURRENT_TIMESTAMP);"
+                   )
+
 
 def db_not_main_tables(cursor):
     # Таблица settings(уточняется)
