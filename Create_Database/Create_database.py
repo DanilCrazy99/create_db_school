@@ -206,6 +206,13 @@ def db_main_tables(cursor):
         time timestamp without time zone DEFAULT CURRENT_TIMESTAMP);"
                    )
 
+    # Таблица relations_class_id_chat/таблица зависимостей класса и id чатов
+    cursor.execute("CREATE TABLE IF NOT EXISTS relations_class_id_chat(\
+            id bigserial NOT NULL PRIMARY KEY,\
+            class text NOT NULL,\
+            id_chat_vk integer NOT NULL);"
+                   )
+
 
 def db_not_main_tables(cursor):
     # Таблица settings(уточняется)
