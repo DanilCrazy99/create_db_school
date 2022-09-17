@@ -26,9 +26,10 @@ class Community:
         list_items = self.getChatList()
         list_ids = []
         for a in range(len(list_items['items'])):
-            list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
+            if list_items['items'][a]['conversation']['peer']['type'] == 'chat':
+                list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
         return list_ids
-                            # if 'owner_id': -215601456
+                            # if 'owner_id': -215601456     type chat
                          # {'conversation': {'peer': {'id':
 test1 = Community()
 print(test1.get_chats_ids())  # В скобки ввести id беседы
