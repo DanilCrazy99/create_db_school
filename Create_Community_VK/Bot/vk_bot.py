@@ -7,6 +7,7 @@ import time
 import logging
 import traceback
 
+from datetime import datetime, timedelta
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from Create_Community_VK.Config.token import token_group
 from Create_Community_VK.Config.Var_community import group_id
@@ -21,7 +22,7 @@ class MyLongPoll(VkBotLongPoll):
                 for event in self.check():
                     yield event
             except Exception as e:
-                print(e)
+                # print(e)
                 # Перехват ошибки сервера, без остановки бота
                 continue
 
@@ -42,6 +43,7 @@ class VkBot:
 
         self.from_id = 0
         self.new_msg = ''
+        self.header_timetable = ''
         self.kb = Keyboards()
         self.db = DataBase()
 
@@ -58,6 +60,45 @@ class VkBot:
     def correct_msg(self, msg):
         tmp_str = msg.lower()
         return tmp_str
+
+    # формируем шапку расписания. return = день недели для SQL запроса
+    def date_words(self, input_week_day):
+        today = datetime.today()
+        result_word = []
+        week_words = ['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота', 'воскресенье']
+        control_week_day = ['/пн', '/вт', '/ср', '/чт', '/пт', '/сб', '/вс']
+        month_words = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября',
+                       'октября', 'ноября', 'декабря']
+
+        number_week_day = datetime.weekday(today)
+        index_input_week_day = control_week_day.index(input_week_day)
+        index_week_today = datetime.weekday(today)
+        len_list_week = len(control_week_day)
+
+        # вычисляем дельту между сегодня и запрашиваемым днём
+        if index_input_week_day != index_week_today:
+            if index_week_today < index_input_week_day:
+                delta_day = index_input_week_day - index_week_today
+            else:
+                delta_day = len_list_week - index_week_today + index_input_week_day
+        else:
+            delta_day = 0
+
+        tomorrow = today + timedelta(days=delta_day)
+        tomorrow_week_day = datetime.weekday(tomorrow)
+
+        # склонение дня недели
+        if index_input_week_day in [2, 4, 5]:
+            day_week = week_words[tomorrow_week_day][:-1] + 'у'
+        else:
+            day_week = week_words[tomorrow_week_day]
+        number_month = int(tomorrow.strftime('%m'))
+
+        self.header_timetable = f'на {day_week}, {tomorrow.strftime("%d")} ' \
+                                f'{month_words[number_month]} ' \
+                                f'{tomorrow.strftime("%Y")}г'
+        print('header_timetable= ', self.header_timetable)
+        return week_words[tomorrow_week_day].capitalize()
 
     def create_msg_table(self, class_letter=['5Б'], week_day=['Вторник']):
         data_timetable = self.db.select_timetable_class(class_letter=class_letter, week_day=week_day)
