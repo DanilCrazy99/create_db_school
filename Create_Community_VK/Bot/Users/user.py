@@ -13,6 +13,7 @@ class Community:
         self.vk_api = self.vk.get_api()
         # self.id_chat = ''
         self.getConversation = self.vk_api.messages.getConversationMembers
+        self.getChatList = self.vk_api.messages.getConversations
 
     def get_members(self, id_chat):
         list_items = self.getConversation(peer_id=id_chat)
@@ -21,6 +22,15 @@ class Community:
             list_members.append(list_items['items'][a]['member_id'])
         return list_members
 
-
+    def get_chats_ids(self):
+        list_items = self.getChatList()
+        list_ids = []
+        for a in range(len(list_items['items'])):
+            list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
+        return list_ids
+                            # if 'owner_id': -215601456
+                         # {'conversation': {'peer': {'id':
 test1 = Community()
-print(test1.get_members(2000000001))  # В скобки ввести id беседы
+print(test1.get_chats_ids())  # В скобки ввести id беседы
+
+
