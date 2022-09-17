@@ -30,10 +30,11 @@ class Community:
                 list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
         return list_ids
 
-    def check_is_member_chat(self, user_id, chat_id):
+    def check_is_member_chat(self, user_id):
         chat_list_this_id = []
-        list_members = self.get_members(chat_id)
-        for a in range(len(list_members)):
-            if user_id in list_members[a]:
-                chat_list_this_id.append(list_members[a])
+        list_chats_id = self.get_chats_ids()
+        for a in range(len(list_chats_id)):
+            list_members = self.get_members(list_chats_id[a])
+            if user_id in list_members:
+                chat_list_this_id.append(list_chats_id[a])
         return chat_list_this_id
