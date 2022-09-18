@@ -1,4 +1,5 @@
 import vk_api
+import requests
 from Create_Community_VK.Config.Var_community import token_group
 
 
@@ -11,11 +12,11 @@ class Community:
         # используем .vk_api() для вызова API
         self.vk_api = self.vk.get_api()
         # self.id_chat = ''
-        self.getConversation = self.vk_api.messages.getConversationMembers
+        self.getConversation_Mem = self.vk_api.messages.getConversationMembers
         self.getChatList = self.vk_api.messages.getConversations
 
     def get_members(self, id_chat):
-        list_items = self.getConversation(peer_id=id_chat)
+        list_items = self.getConversation_Mem(peer_id=id_chat)
         list_members = []
         for a in range(len(list_items['items'])):
             list_members.append(list_items['items'][a]['member_id'])
@@ -40,8 +41,32 @@ class Community:
 
     # получаем название чатов. ответ в виде списка
     def title_chat(self, user_id):
-        list_chat_title =[]
+        list_chat_title = []
         for items in self.check_is_member_chat(user_id):
             title = self.vk_api.messages.getConversationsById(peer_ids=items)
             list_chat_title.append(title['items'][0]['chat_settings']['title'])
         return list_chat_title
+
+    def get_xl_file_from_msg(self, id_editor=103933889):
+        def give_file_from_url(url):
+            r = requests.get(url, allow_redirects=True)
+            with open('timetable.xlsx', 'wb') as o:
+                o.write(r.content)
+
+        url_value = ''
+        id_msg = self.getChatList()
+        for a in range(len(id_msg['items'])):
+            if id_msg['items'][a]['conversation']['peer']['id'] == id_editor:
+                info_msg_editor = id_msg['items'][a]
+        last_id_msg = info_msg_editor['conversation']['last_conversation_message_id']
+        get_info_about_msg = self.vk_api.messages.getByConversationMessageId
+        list_items = get_info_about_msg(peer_id=id_editor, conversation_message_ids=last_id_msg)
+        if list_items['count'] == 1:
+            attachment = list_items['items'][0]['attachments'][0]['doc']
+            if attachment['ext'] == 'xlsx':
+                url_value = attachment['url']
+            if url_value:
+                give_file_from_url(url_value)
+
+
+danil = Community()
