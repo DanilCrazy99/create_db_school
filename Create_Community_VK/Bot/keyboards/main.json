@@ -17,7 +17,7 @@
           "type": "text",
           "label": "/пн"
         },
-        "color": "primary"
+        "color": "positive"
       },
       {
         "action": {
@@ -61,14 +61,7 @@
           "type": "text",
           "label": "/вс"
         },
-        "color": "positive"
-      },
-      {
-        "action": {
-          "type": "text",
-          "label": "//..."
-        },
-        "color": "secondary"
+        "color": "negative"
       }
     ]
   ]
