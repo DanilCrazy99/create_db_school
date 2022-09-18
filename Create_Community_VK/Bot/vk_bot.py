@@ -135,7 +135,7 @@ class VkBot:
                         continue
 
                     if self.new_msg == 'расписание на ...':
-                        self.send_msg('за какой период хотите узнать'
+                        self.send_msg('за какой день хотите узнать'
                                       ' расписание?', keyboard=self.kb.get_keyboard('main'))
                     elif self.new_msg in ['/пн', '/вт', '/ср', '/чт', '/пт', '/сб', '/вс']:
                         self.date_words(self.new_msg)
