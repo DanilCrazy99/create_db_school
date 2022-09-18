@@ -12,7 +12,6 @@ def create_timetable_list(path):
     for columns_name_class in range(3, sheet.max_column):  # Получаю список классов при помощи прохода по 3-й строке
         if sheet[3][columns_name_class].value:
             list_class.append(sheet[3][columns_name_class].value)
-    incr = 0
     for columns in range(3, sheet.max_column):  # переборка по координате "буква"
         for rows in range(3, 52):  # переборка по координате "цифра"
             day_week_val = int(rows / 8)
