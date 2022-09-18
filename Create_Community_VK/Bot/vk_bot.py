@@ -94,18 +94,27 @@ class VkBot:
             day_week = week_words[tomorrow_week_day]
         number_month = int(tomorrow.strftime('%m'))
 
+       # формируем шапку расписания на день
         self.header_timetable = f'на {day_week}, {tomorrow.strftime("%d")} ' \
                                 f'{month_words[number_month]} ' \
                                 f'{tomorrow.strftime("%Y")}г'
-        print('header_timetable= ', self.header_timetable)
-        return week_words[tomorrow_week_day].capitalize()
+        # print('header_timetable= ', self.header_timetable)
 
-    def create_msg_table(self, class_letter=['5Б'], week_day=['Вторник']):
+        result_word.append(week_words[tomorrow_week_day].capitalize())
+        return result_word
+
+    # получение расписания на один день
+    def daily_lesson_schedule(self, class_letter=['5Б'], week_day=['Вторник']):
         data_timetable = self.db.select_timetable_class(class_letter=class_letter, week_day=week_day)
         str_table = ''
+        circle = 0
         for data_week in data_timetable:
+            circle += 1
             str_table += '\n' + str(data_week[2])  # номер урока
             str_table += ' - ' + data_week[3]  # предмет
+        if circle == 0:
+            str_table = '\n*** нет занятий ***'
+
         return str_table
 
 
@@ -128,17 +137,12 @@ class VkBot:
                     if self.new_msg == 'расписание на ...':
                         self.send_msg('за какой период хотите узнать'
                                       ' расписание?', keyboard=self.kb.get_keyboard('main'))
-                    elif self.new_msg == '/пн':
-                        tt = time.strftime('%A %d %B %Y', time.localtime())
-                        self.send_msg('расписание на пн: '
-                                      f'\n{tt}' + self.create_msg_table(),
-                                      keyboard=self.kb.get_keyboard('main'))
-                    elif self.new_msg == '/вт':
-                        tt = time.strftime('%A %d %B %Y', time.localtime())
-                        self.send_msg('расписание на завтра: '
-                                      f'\n{tt}'
-                                      '\n1 - ин-яз(анг)'
-                                      '\n2 - литература', keyboard=self.kb.get_keyboard('main'))
+                    elif self.new_msg in ['/пн', '/вт', '/ср', '/чт', '/пт', '/сб', '/вс']:
+                        self.date_words(self.new_msg)
+                        msg_tmp = f'{self.header_timetable} ' \
+                                  f'{self.daily_lesson_schedule(class_letter=["5А"], week_day=self.date_words(self.new_msg))}'
+
+                        self.send_msg(message=msg_tmp, keyboard=self.kb.get_keyboard('main'))
                     else:
                         self.send_msg('Ваша команда не распознана.\nВоспользуйтесь'
                                       ' клавиатурой.', keyboard=self.kb.get_keyboard('main'))
