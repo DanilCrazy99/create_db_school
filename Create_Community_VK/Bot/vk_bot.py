@@ -13,6 +13,7 @@ from Create_Community_VK.Config.token import token_group
 from Create_Community_VK.Config.Var_community import group_id
 from Create_Community_VK.Bot.keyboard import Keyboards
 from Create_Community_VK.Bot.db.database import DataBase
+from Create_Community_VK.Bot.Users.user import Community
 
 
 class MyLongPoll(VkBotLongPoll):
@@ -46,6 +47,7 @@ class VkBot:
         self.header_timetable = ''
         self.kb = Keyboards()
         self.db = DataBase()
+        self.community = Community()
 
 # Отправка сообщения пользователю (+ вложение + клавиатура)
     def send_msg(self, message, attachment: list = [], keyboard=None):
@@ -130,6 +132,8 @@ class VkBot:
                     # кто отправил сообщение
                     self.from_id = event.obj['message']['from_id']
 
+                    list_chat_title =[]
+
                     if self.from_id < 0:
                         # прерываем если пришло сообщение от группы
                         continue
@@ -138,11 +142,20 @@ class VkBot:
                         self.send_msg('за какой день хотите узнать'
                                       ' расписание?', keyboard=self.kb.get_keyboard('main'))
                     elif self.new_msg in ['/пн', '/вт', '/ср', '/чт', '/пт', '/сб', '/вс']:
-                        self.date_words(self.new_msg)
-                        msg_tmp = f'{self.header_timetable} ' \
-                                  f'{self.daily_lesson_schedule(class_letter=["5А"], week_day=self.date_words(self.new_msg))}'
+                        list_chat_title = self.community.title_chat(user_id=self.from_id)
+                        tmp_list_title = []
+                        for item_chat_title in list_chat_title:
+                            tmp_list_title.append(item_chat_title)
 
-                        self.send_msg(message=msg_tmp, keyboard=self.kb.get_keyboard('main'))
+                            self.date_words(self.new_msg)
+                            msg_tmp = f'{self.header_timetable}\nкласс: {item_chat_title}' \
+                                      f'{self.daily_lesson_schedule(class_letter=tmp_list_title, week_day=self.date_words(self.new_msg))}'
+
+                            self.send_msg(message=msg_tmp, keyboard=self.kb.get_keyboard('clear'))
+                            # очищаем список title чатов
+                            tmp_list_title.clear()
+
+                        self.send_msg(message='Выберите день', keyboard=self.kb.get_keyboard('main'))
                     else:
                         self.send_msg('Ваша команда не распознана.\nВоспользуйтесь'
                                       ' клавиатурой.', keyboard=self.kb.get_keyboard('main'))
