@@ -37,3 +37,11 @@ class Community:
             if user_id in list_members:
                 chat_list_this_id.append(list_chats_id[a])
         return chat_list_this_id
+
+    # получаем название чатов. ответ в виде списка
+    def title_chat(self, user_id):
+        list_chat_title =[]
+        for items in self.check_is_member_chat(user_id):
+            title = self.vk_api.messages.getConversationsById(peer_ids=items)
+            list_chat_title.append(title['items'][0]['chat_settings']['title'])
+        return list_chat_title
