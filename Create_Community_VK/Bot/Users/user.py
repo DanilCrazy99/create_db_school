@@ -12,10 +12,10 @@ class Community:
         # используем .vk_api() для вызова API
         self.vk_api = self.vk.get_api()
         # self.id_chat = ''
-        self.getConversation_Mem = self.vk_api.messages.getConversationMembers
+        self.getConversation_Mem = self.vk_api.messages.getConversationMembers  #
         self.getChatList = self.vk_api.messages.getConversations
 
-    def get_members(self, id_chat):
+    def get_members(self, id_chat):  # Получаю на вход id чата в котором нужно узнать участников
         list_items = self.getConversation_Mem(peer_id=id_chat)
         list_members = []
         for a in range(len(list_items['items'])):
@@ -47,7 +47,7 @@ class Community:
             list_chat_title.append(title['items'][0]['chat_settings']['title'])
         return list_chat_title
 
-    def get_xl_file_from_msg(self, id_editor=103933889):
+    def get_xl_file_from_msg(self, id_editor=1640521):
         def give_file_from_url(url):
             r = requests.get(url, allow_redirects=True)
             with open('timetable.xlsx', 'wb') as o:
@@ -55,18 +55,16 @@ class Community:
 
         url_value = ''
         id_msg = self.getChatList()
-        for a in range(len(id_msg['items'])):
-            if id_msg['items'][a]['conversation']['peer']['id'] == id_editor:
-                info_msg_editor = id_msg['items'][a]
-        last_id_msg = info_msg_editor['conversation']['last_conversation_message_id']
-        get_info_about_msg = self.vk_api.messages.getByConversationMessageId
-        list_items = get_info_about_msg(peer_id=id_editor, conversation_message_ids=last_id_msg)
-        if list_items['count'] == 1:
-            attachment = list_items['items'][0]['attachments'][0]['doc']
-            if attachment['ext'] == 'xlsx':
-                url_value = attachment['url']
-            if url_value:
-                give_file_from_url(url_value)
-
-
-danil = Community()
+        if id_msg:
+            for a in range(len(id_msg['items'])):
+                if id_msg['items'][a]['conversation']['peer']['id'] == id_editor:
+                    info_msg_editor = id_msg['items'][a]
+            last_id_msg = info_msg_editor['conversation']['last_conversation_message_id']
+            get_info_about_msg = self.vk_api.messages.getByConversationMessageId
+            list_items = get_info_about_msg(peer_id=id_editor, conversation_message_ids=last_id_msg)
+            if len(list_items['items'][0]['attachments']) == 1:
+                attachment = list_items['items'][0]['attachments'][0]['doc']
+                if attachment['ext'] == 'xlsx':
+                    url_value = attachment['url']
+                if url_value:
+                    give_file_from_url(url_value)
