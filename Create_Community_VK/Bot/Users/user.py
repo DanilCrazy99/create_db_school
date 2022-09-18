@@ -53,6 +53,7 @@ class Community:
             with open('timetable.xlsx', 'wb') as o:
                 o.write(r.content)
 
+        info_msg_editor = {}
         url_value = ''
         id_msg = self.getChatList()
         if id_msg:
