@@ -60,7 +60,8 @@ class VkBot:
         self.vk.method('messages.send', parameters)
 
     def correct_msg(self, msg):
-        tmp_str = msg.lower()
+        # переводим сообщение в нижний регистр и удаляем пробелы в начале и в конце строки
+        tmp_str = msg.lower().strip()
         return tmp_str
 
     # формируем шапку расписания. return = день недели для SQL запроса
@@ -69,8 +70,8 @@ class VkBot:
         result_word = []
         week_words = ['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота', 'воскресенье']
         control_week_day = ['/пн', '/вт', '/ср', '/чт', '/пт', '/сб', '/вс']
-        month_words = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября',
-                       'октября', 'ноября', 'декабря']
+        month_words = ['декабря', 'января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября',
+                       'октября', 'ноября']
 
         number_week_day = datetime.weekday(today)
         index_input_week_day = control_week_day.index(input_week_day)
@@ -129,10 +130,13 @@ class VkBot:
                 # обработка поступившего личного сообщения
                 if event.type == VkBotEventType.MESSAGE_NEW:
                     self.new_msg = self.correct_msg(event.obj['message']['text'])
+                    # проверка на наличие обрабатываемого сообщения
+
                     # кто отправил сообщение
                     self.from_id = event.obj['message']['from_id']
 
                     list_chat_title =[]
+                    self.community.get_xl_file_from_msg()
 
                     if self.from_id < 0:
                         # прерываем если пришло сообщение от группы
@@ -144,7 +148,9 @@ class VkBot:
                     elif self.new_msg in ['/пн', '/вт', '/ср', '/чт', '/пт', '/сб', '/вс']:
                         list_chat_title = self.community.title_chat(user_id=self.from_id)
                         tmp_list_title = []
+                        cicle = 0
                         for item_chat_title in list_chat_title:
+                            cicle += 1
                             tmp_list_title.append(item_chat_title)
 
                             self.date_words(self.new_msg)
@@ -154,6 +160,8 @@ class VkBot:
                             self.send_msg(message=msg_tmp, keyboard=self.kb.get_keyboard('clear'))
                             # очищаем список title чатов
                             tmp_list_title.clear()
+                        if cicle == 0:
+                            self.send_msg(message='Для работы с ботом необходимо состоять в чате своего класса.')
 
                         self.send_msg(message='Выберите день', keyboard=self.kb.get_keyboard('main'))
                     else:
