@@ -132,12 +132,11 @@ class VkBot:
                     self.new_msg = self.correct_msg(event.obj['message']['text'])
 
                     # обработка присоединённого файла
-                    print(event.obj['message']['attachments'])
-                    print(len(event.obj['message']['attachments']))
                     if len(event.obj['message']['attachments']) != 0:
-                        ext_file = event.obj['message']['attachments']['doc']['ext']
-                        print('ext_file= ', ext_file)
+                        ext_file = event.obj['message']['attachments'][0]['doc']['ext']
                         if ext_file == 'xlsx':
+                            print('поступил xlsx файл')
+                            logging.info('поступил xlsx файл')
                             self.community.get_xl_file_from_msg()
 
                     # проверка на наличие обрабатываемого сообщения
