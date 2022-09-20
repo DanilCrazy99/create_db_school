@@ -15,37 +15,37 @@ class Community:
         self.getConversation_Mem = self.vk_api.messages.getConversationMembers  #
         self.getChatList = self.vk_api.messages.getConversations
 
+        def get_chats_ids():  # Получаю на выходе список id чатов группы
+            list_items = self.getChatList()
+            list_ids = []
+            for a in range(len(list_items['items'])):
+                if list_items['items'][a]['conversation']['peer']['type'] == 'chat':
+                    list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
+            return list_ids
+        self.list_ids = get_chats_ids()
+
     def get_members(self, id_chat):  # Получаю на вход id чата в котором нужно узнать участников
         list_items = self.getConversation_Mem(peer_id=id_chat)
         list_members = []
         for a in range(len(list_items['items'])):
             list_members.append(list_items['items'][a]['member_id'])
-        return list_members
+        return list_members  # Получаю на выходе список id участников этого чата
 
-    def get_chats_ids(self):
-        list_items = self.getChatList()
-        list_ids = []
-        for a in range(len(list_items['items'])):
-            if list_items['items'][a]['conversation']['peer']['type'] == 'chat':
-                list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
-        return list_ids
-
-    # получаем возраст пользователя. api с токеном пользователя
+    # Получаем возраст пользователя. API с токеном пользователя
     def age_indicated(self, user_id):
         info = self.vk_api.account.getProfileInfo()
         print('info =', info)
         pass
 
-    def check_is_member_chat(self, user_id):
+    def check_is_member_chat(self, user_id):  # Получаю на вход id пользователя которого необходимо проверить
         chat_list_this_id = []
-        list_chats_id = self.get_chats_ids()
-        for a in range(len(list_chats_id)):
-            list_members = self.get_members(list_chats_id[a])
+        for a in range(len(self.list_ids)):
+            list_members = self.get_members(self.list_ids[a])
             if user_id in list_members:
-                chat_list_this_id.append(list_chats_id[a])
-        return chat_list_this_id
+                chat_list_this_id.append(self.list_ids[a])
+        return chat_list_this_id  # На выход получаю id чатов в которых состоит участник
 
-    # получаем название чатов. ответ в виде списка
+    # Получаем название чатов. Ответ в виде списка
     def title_chat(self, user_id):
         list_chat_title = []
         for items in self.check_is_member_chat(user_id):
@@ -75,3 +75,4 @@ class Community:
                     url_value = attachment['url']
                 if url_value:
                     give_file_from_url(url_value)
+
