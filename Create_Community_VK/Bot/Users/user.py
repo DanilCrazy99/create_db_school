@@ -30,6 +30,12 @@ class Community:
                 list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
         return list_ids
 
+    # получаем возраст пользователя. api с токеном пользователя
+    def age_indicated(self, user_id):
+        info = self.vk_api.account.getProfileInfo()
+        print('info =', info)
+        pass
+
     def check_is_member_chat(self, user_id):
         chat_list_this_id = []
         list_chats_id = self.get_chats_ids()
