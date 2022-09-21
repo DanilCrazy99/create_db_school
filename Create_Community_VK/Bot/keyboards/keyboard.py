@@ -45,23 +45,27 @@ def generator_keyboard(role_id):
     :param role_id: Роль пользователя в группе
     :return: keyboard формат ответа json строка
     """
-    k = ''
+    result = {}
     keyboard = VkKeyboard(one_time=True)
+    if role_id > 0:
 
-    keyboard.add_button('/пн', color=VkKeyboardColor.POSITIVE)
-    keyboard.add_button('/вт', color=VkKeyboardColor.POSITIVE)
-    keyboard.add_button('/ср', color=VkKeyboardColor.POSITIVE)
-    keyboard.add_button('/чт', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('/пн', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('/вт', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('/ср', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('/чт', color=VkKeyboardColor.POSITIVE)
 
-    keyboard.add_line()  # Переход на новую строку
-    # keyboard.add_location_button()
+        keyboard.add_line()  # Переход на новую строку
+        # keyboard.add_location_button()
 
-    keyboard.add_button('/пт', color=VkKeyboardColor.POSITIVE)
-    keyboard.add_button('/сб', color=VkKeyboardColor.POSITIVE)
-    keyboard.add_button('/вс', color=VkKeyboardColor.NEGATIVE)
-    keyboard.add_button('/help', color=VkKeyboardColor.NEGATIVE)
+        keyboard.add_button('/пт', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('/сб', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('/вс', color=VkKeyboardColor.NEGATIVE)
+        keyboard.add_button('/help', color=VkKeyboardColor.NEGATIVE)
+        result = keyboard.get_keyboard()
+    else:
+        result = keyboard.get_empty_keyboard()
 
-    return keyboard.get_keyboard()
+    return result
 
 
 if __name__ == '__main__':

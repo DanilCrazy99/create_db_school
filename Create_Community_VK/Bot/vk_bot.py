@@ -172,7 +172,8 @@ class VkBot:
                                 # очищаем список title чатов
                                 tmp_list_title.clear()
                             if cicle == 0:
-                                self.send_msg(message='Для работы с ботом необходимо состоять в чате своего класса.')
+                                self.send_msg(message='Для работы с ботом необходимо состоять в чате своего класса.'
+                                              , keyboard=gen_key(role_id=0))
 
                             self.send_msg(message='Выберите день', keyboard=self.kb.get_keyboard('main'))
                         else:
