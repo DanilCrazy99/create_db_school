@@ -33,3 +33,22 @@ class DataBase:
         self.__cursor.execute(sql)
         result = self.__cursor.fetchall()
         return result
+
+    def select_roles_with_vk_id(self, id_user):  # Проверка на наличие специфичной роли в postgres
+        with self.__cursor() as cursor:
+            cursor.execute(
+                "SELECT * FROM role INNER JOIN users ON role.id = users.role_id;"
+            )
+            a = cursor.fetchall()  # Забираю результат командной строки
+            b = []
+            d = []
+            for c in range(len(a)):
+                b.append(a[c][1])  # Получаю роли
+                d.append(a[c][4])  # Получаю id
+            e = {'role': b}
+            f = {'id': d}
+            if id_user in f['id']:
+                for i in range(len(f['id'])):
+                    if f['id'][i] == id_user:
+                        return e['role'][i]
+
