@@ -15,6 +15,7 @@ from Create_Community_VK.Bot.keyboard import Keyboards
 from Create_Community_VK.Bot.db.database import DataBase
 from Create_Community_VK.Bot.Users.user import Community
 from Create_Community_VK.Config.control_word import list_week_day, control_word, list_week_words, list_month_words
+from Create_Community_VK.Bot.keyboards.keyboard import generator_keyboard as gen_key
 
 
 class MyLongPoll(VkBotLongPoll):
@@ -152,8 +153,9 @@ class VkBot:
                             continue
 
                         if self.new_msg == 'расписание на ...':
+                            print('расписание на ...')
                             self.send_msg('за какой день хотите узнать'
-                                          ' расписание?', keyboard=self.kb.get_keyboard('main'))
+                                          ' расписание?', keyboard=gen_key(role_id=1))
                         elif self.new_msg in list_week_day:
                             list_chat_title = self.community.title_chat(user_id=self.from_id)
                             tmp_list_title = []

@@ -41,9 +41,11 @@ def example_keyboard():
 def generator_keyboard(role_id):
     """
     Генератор клавиатуры согласно роли пользователя в группе.
+
     :param role_id: Роль пользователя в группе
-    :return: keyboard
+    :return: keyboard формат ответа json строка
     """
+    k = ''
     keyboard = VkKeyboard(one_time=True)
 
     keyboard.add_button('/пн', color=VkKeyboardColor.POSITIVE)
@@ -52,11 +54,12 @@ def generator_keyboard(role_id):
     keyboard.add_button('/чт', color=VkKeyboardColor.POSITIVE)
 
     keyboard.add_line()  # Переход на новую строку
-    keyboard.add_location_button()
+    # keyboard.add_location_button()
 
     keyboard.add_button('/пт', color=VkKeyboardColor.POSITIVE)
     keyboard.add_button('/сб', color=VkKeyboardColor.POSITIVE)
     keyboard.add_button('/вс', color=VkKeyboardColor.NEGATIVE)
+    keyboard.add_button('/help', color=VkKeyboardColor.NEGATIVE)
 
     return keyboard.get_keyboard()
 
