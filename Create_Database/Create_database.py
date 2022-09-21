@@ -135,7 +135,7 @@ def db_main_tables(cursor):
                    )
 
     cursor.execute("CREATE TABLE IF NOT EXISTS role(\
-        id bigserial NOT NULL PRIMARY KEY,\
+        id integer NOT NULL PRIMARY KEY UNIQUE,\
         role text NOT NULL,\
         description text\
         );"
