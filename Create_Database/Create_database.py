@@ -234,9 +234,23 @@ def db_main_tables(cursor):
                    )
 
     # Таблица состояний
+    """key_stats использовать с числами от 0 до 3(0,1,2,3)
+    Числа обозначают: 
+        0 = кнопка не используется
+        1 = Юзер не получал расписание(красный)
+        2 = Юзер получал расписание(зеленый)
+        3 = Юзер не получал изменения расписания(синий)
+    """
     cursor.execute("CREATE TABLE IF NOT EXISTS status(\
-        id bigserial NOT NULL PRIMARY KEY, \
-        status text NOT NULL\
+        id integer NOT NULL PRIMARY KEY UNIQUE, \
+        status_member text NOT NULL, \
+        key_stats_1 integer DEFAULT 0, \
+        key_stats_2 integer DEFAULT 0, \
+        key_stats_3 integer DEFAULT 0, \
+        key_stats_4 integer DEFAULT 0, \
+        key_stats_5 integer DEFAULT 0, \
+        key_stats_6 integer DEFAULT 0, \
+        key_stats_7 integer DEFAULT 0, \
         );"
                    )
 
