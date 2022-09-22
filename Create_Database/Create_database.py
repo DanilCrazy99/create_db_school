@@ -196,15 +196,15 @@ def db_main_tables(cursor):
         lesson_number integer NOT NULL, \
         academic_discipline text NOT NULL, \
         day_of_week text NOT NULL, \
-        editor text DEFAULT 'admin'\
+        editor text DEFAULT 'admin', \
+        id_time_activate integer\
         );"
                    )
 
     cursor.execute("CREATE TABLE IF NOT EXISTS timetable_time_activate(\
         id integer NOT NULL PRIMARY KEY, \
         time_update timestamp without time zone DEFAULT CURRENT_TIMESTAMP, \
-        time_activate timestamp without time zone, \
-        id_timetable integer\
+        time_activate timestamp without time zone\
         );"
                    )
 
