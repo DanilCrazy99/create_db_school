@@ -261,7 +261,7 @@ def db_not_main_tables(cursor):
     cursor.execute("CREATE TABLE IF NOT EXISTS users(\
         id bigserial NOT NULL PRIMARY KEY, \
         user_id_vk integer NOT NULL, \
-        role_id integer DEFAULT 1, \
+        role_id integer DEFAULT 0, \
         invitation_sent boolean NOT NULL DEFAULT false, \
         time_unanswered_msg integer\
         );"
