@@ -1,8 +1,8 @@
 # -*- coding: utf8 -*-
+# файл генерации клавиатур
 
-# import vk_api
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
-# from vk_api.utils import get_random_id
+from Create_Community_VK.Bot.Users.user import Community
 
 
 def example_keyboard():
@@ -38,36 +38,74 @@ def example_keyboard():
     # )
 
 
-def generator_keyboard(role_id):
+def generator_keyboard(role_id, one_time_method=False):
     """
     Генератор клавиатуры согласно роли пользователя в группе.
 
     :param role_id: Роль пользователя в группе
+    :param one_time_method: Метод отправки клавиатуры Inline=True или стандартная=False
     :return: keyboard формат ответа json строка
     """
     result = {}
-    keyboard = VkKeyboard(one_time=True)
-    if role_id > 0:
+    new_timetable = False
+    keyboard = VkKeyboard(one_time=one_time_method)
 
-        keyboard.add_button('/пн', color=VkKeyboardColor.POSITIVE)
-        keyboard.add_button('/вт', color=VkKeyboardColor.POSITIVE)
-        keyboard.add_button('/ср', color=VkKeyboardColor.POSITIVE)
-        keyboard.add_button('/чт', color=VkKeyboardColor.POSITIVE)
+    if role_id == 1:  # клавиатура начального входа без роли
+        keyboard.add_button('/я из начальной школы', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_line()  # Переход на новую строку
+        keyboard.add_button('/я из средней школы', color=VkKeyboardColor.POSITIVE)
+        result = keyboard.get_keyboard()
+
+    elif role_id == 2:  # клавиатура главная для членов
+        keyboard.add_button('/вступить в чат', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_line()  # Переход на новую строку
+        keyboard.add_button('/help', color=VkKeyboardColor.NEGATIVE)
+        keyboard.add_button('/покинуть чат', color=VkKeyboardColor.NEGATIVE)
+        result = keyboard.get_keyboard()
+
+    elif role_id == 3:  # клавиатура выбора дня недели расписания
+        keyboard.add_button('/пн', color=color_key())
+        keyboard.add_button('/вт', color=color_key())
+        keyboard.add_button('/ср', color=color_key())
+        keyboard.add_button('/чт', color=color_key())
 
         keyboard.add_line()  # Переход на новую строку
         # keyboard.add_location_button()
 
-        keyboard.add_button('/пт', color=VkKeyboardColor.POSITIVE)
-        keyboard.add_button('/сб', color=VkKeyboardColor.POSITIVE)
-        keyboard.add_button('/вс', color=VkKeyboardColor.NEGATIVE)
-        keyboard.add_button('/help', color=VkKeyboardColor.NEGATIVE)
+        keyboard.add_button('/пт', color=color_key())
+        keyboard.add_button('/сб', color=color_key())
+        keyboard.add_button('/вс', color=color_key())
+        keyboard.add_button('/exit', color=color_key())
         result = keyboard.get_keyboard()
-    else:
-        result = keyboard.get_empty_keyboard()
 
+    elif role_id == 4:  # клавиатура завуча
+        keyboard.add_button('/загрузить расписание', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('/активировать расписание', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_line()  # Переход на новую строку
+        keyboard.add_button('/help', color=VkKeyboardColor.NEGATIVE)
+        keyboard.add_button('/удалить загрузку', color=VkKeyboardColor.NEGATIVE)
+        result = keyboard.get_keyboard()
+
+    else:  # очистка от всех клавиатур
+        result = keyboard.get_empty_keyboard()
+    return result
+
+
+def color_key(id_user_vk=None):
+    """
+    Определение цвета кнопки
+    :param id_user_vk: ID пользователя в ВК
+    :return: Описатель цвета кнопки
+    """
+    community = Community()
+    result = VkKeyboardColor.POSITIVE
+    if id_user_vk:
+        # проверка на новое расписание
+        result = VkKeyboardColor.POSITIVE
     return result
 
 
 if __name__ == '__main__':
-    key = generator_keyboard(1)
+    # для тестов
+    key = generator_keyboard(4)
     print('key= ', key)
