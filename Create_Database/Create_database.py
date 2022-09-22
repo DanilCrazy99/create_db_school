@@ -213,6 +213,18 @@ def db_main_tables(cursor):
             id_chat_vk integer NOT NULL);"
                    )
 
+    # Таблица сервера состояний
+    cursor.execute("CREATE TABLE IF NOT EXISTS status_server("
+                   "id bigserial NOT NULL PRIMARY KEY, "
+                   "id_user_vk integer NOT NULL, "
+                   "id_status integer);"
+                   )
+
+    # Таблица состояний
+    cursor.execute("CREATE TABLE IF NOT EXISTS status("
+                   "id bigserial NOT NULL PRIMARY KEY, "
+                   "status text NOT NULL);")
+
 
 def db_not_main_tables(cursor):
     # Таблица settings(уточняется)
@@ -243,3 +255,6 @@ def db_not_main_tables(cursor):
 
 while input_case_var() == 0:
     pass
+
+if __name__ == '__main__':
+    input_case_var()
