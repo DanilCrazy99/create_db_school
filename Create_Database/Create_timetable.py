@@ -23,7 +23,7 @@ def create_timetable_list(path):
                     for i in range(7):  # Записываем 7 строк под ним
                         incr = len(list_lessons)-1
                         if sheet[rows + i + 1][columns].value is None:  # Убираю значения None из списков
-                            pass  # list_lessons[incr].append(f'{name_class}, _')
+                            pass
                         else:
                             lesson_cell_coordinate_number = rows + i + 1
                             list_lessons[incr].append(name_class)
@@ -31,8 +31,6 @@ def create_timetable_list(path):
                             list_lessons[incr].append(sheet[rows + i + 1][columns].value)
                             list_lessons[incr].append(day_week)
                             list_lessons[incr].append(sheet[2][1].value)
-                        # if i == 6:
-                        #     list_lessons[incr].append(f'{name_class}, _')
                         list_lessons.append([])
     return list_lessons
 
@@ -43,8 +41,3 @@ def create_postgres_list(list_func):
         if len(list_func[a]) != 0:
             completed_list.append(list_func[a])
     return completed_list
-
-
-# test_mass = create_postgres_list(create_timetable_list(path_timetable))
-# for a in range(len(test_mass)):
-#     print(test_mass[a])
