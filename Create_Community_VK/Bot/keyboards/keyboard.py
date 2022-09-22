@@ -13,7 +13,7 @@ def example_keyboard():
 
     keyboard = VkKeyboard(one_time=True)
 
-    keyboard.add_button('Белая кнопка', color=VkKeyboardColor.SECONDARY)
+    keyboard.add_button('Белая кнопка')  # , color=VkKeyboardColor.SECONDARY
     keyboard.add_button('Зелёная кнопка', color=VkKeyboardColor.POSITIVE)
     keyboard.add_button('Красная кнопка', color=VkKeyboardColor.NEGATIVE)
     keyboard.add_button('Синяя кнопка', color=VkKeyboardColor.PRIMARY)
@@ -47,7 +47,6 @@ def generator_keyboard(role_id, one_time_method=False):
     :return: keyboard формат ответа json строка
     """
     result = {}
-    new_timetable = False
     keyboard = VkKeyboard(one_time=one_time_method)
 
     if role_id == 1:  # клавиатура начального входа без роли
