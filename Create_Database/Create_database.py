@@ -159,17 +159,17 @@ def db_main_tables(cursor):
         phone integer, \
         user_id integer, \
         description text\
-    );"
+        );"
                    )
 
     # Таблица teacher/учителя(id, имя, отчество, фамилия, телефон)
     cursor.execute("CREATE TABLE IF NOT EXISTS teacher(\
-         id bigserial NOT NULL PRIMARY KEY, \
-         name text NOT NULL, \
-         patronymic text, \
-         surname text, \
-         phone integer\
-         );"
+        id bigserial NOT NULL PRIMARY KEY, \
+        name text NOT NULL, \
+        patronymic text, \
+        surname text, \
+        phone integer\
+        );"
                    )
 
     # Таблица vacation_schedule/отгулы,отпуски
@@ -212,49 +212,50 @@ def db_main_tables(cursor):
 
     # Таблица relations_class_id_chat/таблица зависимостей класса и id чатов
     cursor.execute("CREATE TABLE IF NOT EXISTS relations_class_id_chat(\
-            id bigserial NOT NULL PRIMARY KEY, \
-            class text NOT NULL, \
-            id_chat_vk integer NOT NULL\
-            );"
+        id bigserial NOT NULL PRIMARY KEY, \
+        class text NOT NULL, \
+        id_chat_vk integer NOT NULL\
+        );"
                    )
 
     # Таблица сервера состояний
     cursor.execute("CREATE TABLE IF NOT EXISTS status_server(\
-            id bigserial NOT NULL PRIMARY KEY, \
-            id_user_vk integer NOT NULL, \
-            id_status integer\
-            );"
+        id bigserial NOT NULL PRIMARY KEY, \
+        id_user_vk integer NOT NULL, \
+        id_status integer\
+        );"
                    )
 
     # Таблица состояний
     cursor.execute("CREATE TABLE IF NOT EXISTS status(\
-            id bigserial NOT NULL PRIMARY KEY, \
-            status text NOT NULL\
-            );")
+        id bigserial NOT NULL PRIMARY KEY, \
+        status text NOT NULL\
+        );"
+                   )
 
 
 def db_not_main_tables(cursor):
     # Таблица settings(уточняется)
     cursor.execute("CREATE TABLE IF NOT EXISTS settings(\
-        id bigserial NOT NULL PRIMARY KEY,\
-        name text NOT NULL,\
-        value text,\
+        id bigserial NOT NULL PRIMARY KEY, \
+        name text NOT NULL, \
+        value text, \
         description text\
-    );"
+        );"
                    )
     # Таблица special_room(уточняется)
     cursor.execute("CREATE TABLE IF NOT EXISTS special_room(\
-        id bigserial NOT NULL PRIMARY KEY,\
-        name text NOT NULL,\
+        id bigserial NOT NULL PRIMARY KEY, \
+        name text NOT NULL, \
         class_room_id integer NOT NULL DEFAULT 0\
         );"
                    )
     # Таблица users
     cursor.execute("CREATE TABLE IF NOT EXISTS users(\
-        id bigserial NOT NULL PRIMARY KEY,\
-        user_id_vk integer NOT NULL,\
-        role_id integer DEFAULT 1,\
-        invitation_sent boolean NOT NULL DEFAULT false,\
+        id bigserial NOT NULL PRIMARY KEY, \
+        user_id_vk integer NOT NULL, \
+        role_id integer DEFAULT 1, \
+        invitation_sent boolean NOT NULL DEFAULT false, \
         time_unanswered_msg integer\
         );"
                    )
