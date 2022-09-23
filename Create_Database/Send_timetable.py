@@ -2,15 +2,20 @@ import psycopg2
 import Create_timetable
 from Create_Database.Config.Var_database import schoolName, user, password, host, port, path_timetable
 
+
 def send_timetable():
-    try:
-        connection = psycopg2.connect(
-            database=schoolName,
-            user=user,
-            password=password,
-            host=host,
-            port=port
+    """
+    Загрузка таблицы расписания в БД
+    """
+    connection = psycopg2.connect(
+        database=schoolName,
+        user=user,
+        password=password,
+        host=host,
+        port=port
         )
+
+    try:
         completed_list = Create_timetable.create_postgres_list(Create_timetable.create_timetable_list(path_timetable))
         for a in range(len(completed_list)):
             without_brackets = str(completed_list[a])
@@ -26,11 +31,12 @@ def send_timetable():
                                )
         connection.commit()
     except Exception as _ex:
-        print("[INFO] Error while working with PostgreSQL", _ex)
+        print("[INFO] Error while working with PostgresQL", _ex)
     finally:
         if connection:
             connection.close()
-            print("[INFO] PostgreSQL connection closed")
+            print("[INFO] PostgresQL connection closed")
+
 
 if __name__ == '__main__':
     send_timetable()
