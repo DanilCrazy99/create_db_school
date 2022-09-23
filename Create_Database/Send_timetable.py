@@ -9,7 +9,7 @@ def send_timetable(editor_id_vk='740705763'):
     :param editor_id_vk: id пользователя который прислал изменения(завуч, директор, админ)
     :return id_first_timetable: id первой строки в момент заливки расписания
     """
-
+    id_first_timetable = None  # id первой строки в момент заливки расписания
     try:
         connection = psycopg2.connect(
             database=schoolName,
@@ -21,7 +21,6 @@ def send_timetable(editor_id_vk='740705763'):
         a = Create_timetable.create_timetable_list(path_timetable)
         completed_list, date_time = Create_timetable.create_postgres_list(a)
         send_trigger = False
-        id_first_timetable = None   # id первой строки в момент заливки расписания
         for a in range(len(completed_list)):
             without_brackets = str(completed_list[a])
             without_brackets = without_brackets[:len(without_brackets)-1]
@@ -36,7 +35,7 @@ def send_timetable(editor_id_vk='740705763'):
                                    f"VALUES ({without_brackets}) "
                                    "RETURNING id"
                                    )
-                    id_first_timetable = cursor.fetchall()
+                    id_first_timetable = str(cursor.fetchall())
                     id_first_timetable = id_first_timetable[2:-3]
                     print(id_first_timetable)
                 else:
