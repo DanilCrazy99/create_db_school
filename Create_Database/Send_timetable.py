@@ -18,7 +18,8 @@ def send_timetable(editor_id_vk='740705763'):
             host=host,
             port=port
             )
-        completed_list, date_time = Create_timetable.create_postgres_list(Create_timetable.create_timetable_list(path_timetable))
+        completed_list, date_time = Create_timetable.create_timetable_list(path_timetable)
+        completed_list = Create_timetable.create_postgres_list(completed_list)
         send_trigger = False
         for a in range(len(completed_list)):
             without_brackets = str(completed_list[a])
