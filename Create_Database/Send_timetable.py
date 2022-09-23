@@ -7,15 +7,15 @@ def send_timetable():
     """
     Загрузка таблицы расписания в БД
     """
-    connection = psycopg2.connect(
-        database=schoolName,
-        user=user,
-        password=password,
-        host=host,
-        port=port
-        )
 
     try:
+        connection = psycopg2.connect(
+            database=schoolName,
+            user=user,
+            password=password,
+            host=host,
+            port=port
+            )
         completed_list = Create_timetable.create_postgres_list(Create_timetable.create_timetable_list(path_timetable))
         for a in range(len(completed_list)):
             without_brackets = str(completed_list[a])
