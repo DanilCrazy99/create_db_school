@@ -250,7 +250,7 @@ def db_main_tables(cursor):
         key_stats_4 integer DEFAULT 0, \
         key_stats_5 integer DEFAULT 0, \
         key_stats_6 integer DEFAULT 0, \
-        key_stats_7 integer DEFAULT 0, \
+        key_stats_7 integer DEFAULT 0\
         );"
                    )
 
