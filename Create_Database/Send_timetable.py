@@ -45,7 +45,6 @@ def send_timetable(editor_id_vk='740705763'):
                                    "day_of_week) "
                                    f"VALUES ({without_brackets}) "
                                    )
-        connection.commit()
         with connection.cursor() as cursor:
             cursor.execute("INSERT INTO timetable_time_activate ("
                            "time_activate, "
