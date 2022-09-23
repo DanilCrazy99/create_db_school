@@ -200,7 +200,7 @@ def db_main_tables(cursor):
                    )
 
     cursor.execute("CREATE TABLE IF NOT EXISTS timetable_time_activate(\
-        id integer NOT NULL PRIMARY KEY, \
+        id bigserial NOT NULL PRIMARY KEY, \
         time_update timestamp without time zone DEFAULT CURRENT_TIMESTAMP, \
         time_activate timestamp without time zone, \
         editor_user_id integer, \
