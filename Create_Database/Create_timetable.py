@@ -10,6 +10,8 @@ def create_timetable_list(path):
     list_lessons = [[]]
     # info_editor = sheet[2][1].value   Информация: Ответственный и дата
     date_time = sheet[1][5].value
+    if date_time is None:
+        date_time = 0
     for columns_name_class in range(3, sheet.max_column):  # Получаю список классов при помощи прохода по 3-й строке
         if sheet[3][columns_name_class].value:
             list_class.append(sheet[3][columns_name_class].value)
@@ -22,7 +24,7 @@ def create_timetable_list(path):
                     name_class = sheet[rows][columns].value
 
                     for i in range(7):  # Записываем 7 строк под ним
-                        incr = len(list_lessons)-1
+                        incr = len(list_lessons) - 1
                         if sheet[rows + i + 1][columns].value is None:  # Убираю значения None из списков
                             pass
                         else:
