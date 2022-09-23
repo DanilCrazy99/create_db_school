@@ -30,7 +30,6 @@ def create_timetable_list(path):
                             list_lessons[incr].append(str(sheet[lesson_cell_coordinate_number][1].value)[0])
                             list_lessons[incr].append(sheet[rows + i + 1][columns].value)
                             list_lessons[incr].append(day_week)
-                            list_lessons[incr].append(sheet[2][1].value)
                         list_lessons.append([])
     return list_lessons
 

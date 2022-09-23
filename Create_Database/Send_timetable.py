@@ -25,8 +25,7 @@ def send_timetable():
                 cursor.execute("INSERT INTO timetable (class, "
                                "lesson_number, "
                                "academic_discipline, "
-                               "day_of_week, "
-                               "editor) "
+                               "day_of_week) "
                                f"VALUES ({without_brackets})"
                                )
         connection.commit()
