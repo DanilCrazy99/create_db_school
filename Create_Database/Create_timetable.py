@@ -40,5 +40,3 @@ def create_postgres_list(list_func):
         if len(list_func[a]) != 0:
             completed_list.append(list_func[a])
     return completed_list
-
-create_timetable_list('Config/CopyTimetable.xlsx')
