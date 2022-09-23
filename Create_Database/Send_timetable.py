@@ -6,7 +6,8 @@ from Create_Database.Config.Var_database import schoolName, user, password, host
 def send_timetable(editor_id_vk='740705763'):
     """
     Загрузка таблицы расписания в БД
-    :return: id_first_timetable - id первой строки в момент заливки расписания
+    :param editor_id_vk: id пользователя который прислал изменения(завуч, директор, админ)
+    :return id_first_timetable: id первой строки в момент заливки расписания
     """
 
     try:
