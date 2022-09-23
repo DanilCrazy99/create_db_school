@@ -8,7 +8,7 @@ def create_timetable_list(path):
     # print(sheet[3][4].value)   E3    123456789
     list_class = []
     list_lessons = [[]]
-
+    list_info = [sheet[2][1].value, sheet[1][5].value]  # Информация: Ответственный и дата
     for columns_name_class in range(3, sheet.max_column):  # Получаю список классов при помощи прохода по 3-й строке
         if sheet[3][columns_name_class].value:
             list_class.append(sheet[3][columns_name_class].value)
@@ -31,7 +31,7 @@ def create_timetable_list(path):
                             list_lessons[incr].append(sheet[rows + i + 1][columns].value)
                             list_lessons[incr].append(day_week)
                         list_lessons.append([])
-    return list_lessons
+    return list_lessons, list_info
 
 
 def create_postgres_list(list_func):
@@ -40,3 +40,5 @@ def create_postgres_list(list_func):
         if len(list_func[a]) != 0:
             completed_list.append(list_func[a])
     return completed_list
+
+create_timetable_list('Config/CopyTimetable.xlsx')

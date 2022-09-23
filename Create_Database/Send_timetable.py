@@ -17,7 +17,8 @@ def send_timetable():
             host=host,
             port=port
             )
-        completed_list = Create_timetable.create_postgres_list(Create_timetable.create_timetable_list(path_timetable))
+        a = Create_timetable.create_timetable_list(path_timetable)
+        completed_list, info_list = Create_timetable.create_postgres_list(a)
         send_trigger = False
         id_first_timetable = None   # id первой строки в момент заливки расписания
         for a in range(len(completed_list)):
@@ -35,8 +36,8 @@ def send_timetable():
                                    "RETURNING id"
                                    )
                     id_first_timetable = str(cursor.fetchall())
-                    id_first_timetable = id_first_timetable[2:]
-                    id_first_timetable = id_first_timetable[:-3]
+                    id_first_timetable = id_first_timetable[2:-3]
+                    print(id_first_timetable)
                 else:
                     cursor.execute("INSERT INTO timetable (class, "
                                    "lesson_number, "
