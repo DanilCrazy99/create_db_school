@@ -36,7 +36,7 @@ def send_timetable(editor_id_vk='740705763'):
                                    f"VALUES ({without_brackets}) "
                                    "RETURNING id"
                                    )
-                    id_first_timetable = str(cursor.fetchall())
+                    id_first_timetable = cursor.fetchall()
                     id_first_timetable = id_first_timetable[2:-3]
                     print(id_first_timetable)
                 else:
