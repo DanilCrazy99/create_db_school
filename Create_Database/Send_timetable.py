@@ -3,7 +3,7 @@ import Create_timetable
 from Create_Database.Config.Var_database import schoolName, user, password, host, port, path_timetable
 
 
-def send_timetable():
+def send_timetable(editor_id_vk='740705763'):
     """
     Загрузка таблицы расписания в БД
     :return: id_first_timetable - id первой строки в момент заливки расписания
@@ -18,7 +18,7 @@ def send_timetable():
             port=port
             )
         a = Create_timetable.create_timetable_list(path_timetable)
-        completed_list, info_list = Create_timetable.create_postgres_list(a)
+        completed_list, date_time = Create_timetable.create_postgres_list(a)
         send_trigger = False
         id_first_timetable = None   # id первой строки в момент заливки расписания
         for a in range(len(completed_list)):
@@ -46,6 +46,13 @@ def send_timetable():
                                    f"VALUES ({without_brackets}) "
                                    )
         connection.commit()
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO timetable_time_activate ("
+                           "time_activate, "
+                           "editor_user_id, "
+                           "id_timetable) "
+                           f"VALUES ('{date_time}', '{editor_id_vk}', {id_first_timetable})"
+                           )
     except Exception as _ex:
         print("[INFO] Error while working with PostgresQL", _ex)
     finally:
