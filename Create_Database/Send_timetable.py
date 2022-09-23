@@ -18,8 +18,7 @@ def send_timetable(editor_id_vk='740705763'):
             host=host,
             port=port
             )
-        a = Create_timetable.create_timetable_list(path_timetable)
-        completed_list, date_time = Create_timetable.create_postgres_list(a)
+        completed_list, date_time = Create_timetable.create_postgres_list(Create_timetable.create_timetable_list(path_timetable))
         send_trigger = False
         for a in range(len(completed_list)):
             without_brackets = str(completed_list[a])
@@ -53,6 +52,7 @@ def send_timetable(editor_id_vk='740705763'):
                            "id_timetable) "
                            f"VALUES ('{date_time}', '{editor_id_vk}', {id_first_timetable})"
                            )
+            connection.commit()
     except Exception as _ex:
         print("[INFO] Error while working with PostgresQL", _ex)
     finally:
