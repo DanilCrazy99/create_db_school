@@ -50,21 +50,13 @@ def send_timetable(editor_id_vk='740705763'):
         with connection.cursor() as cursor:
             if date_time is None:
                 date_time = datetime.today()
-                cursor.execute("INSERT INTO timetable_time_activate ("
-                               "time_activate, "
-                               "editor_user_id, "
-                               "id_timetable) "
-                               f"VALUES ('{date_time}', '{editor_id_vk}', {id_first_timetable})"
-                               )
-                connection.commit()
-            else:
-                cursor.execute("INSERT INTO timetable_time_activate ("
-                               "time_activate, "
-                               "editor_user_id, "
-                               "id_timetable) "
-                               f"VALUES ('{date_time}', '{editor_id_vk}', {id_first_timetable})"
-                               )
-                connection.commit()
+            cursor.execute("INSERT INTO timetable_time_activate ("
+                           "time_activate, "
+                           "editor_user_id, "
+                           "id_timetable) "
+                           f"VALUES ('{date_time}', '{editor_id_vk}', {id_first_timetable})"
+                           )
+            connection.commit()
     except Exception as _ex:
         print("[INFO] Error while working with PostgresQL", _ex)
     finally:
