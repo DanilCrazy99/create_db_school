@@ -136,16 +136,20 @@ class DataBase:
             result = stop_id[0]
         return result
 
-    def select_time_table_activate(self, id_table_borders=[]):
+    def select_time_table_activate(self, id_table_borders=[], class_letter='', week_day = ''):
         """
         получаем текущее активное расписание
         :param id_table_borders: границы активного распиcания в таблице time_table
-        :return:
+        :return: список активного расписания
         """
         sql = "SELECT id, class, lesson_number, academic_discipline, day_of_week " \
               "FROM timetable " \
-              f"WHERE id >= {id_table_borders[0]} AND id <= {id_table_borders[1]} " \
-              f"ORDER BY class, day_of_week, lesson_number ASC;"
+              f"WHERE id >= {id_table_borders[0]} AND id <= {id_table_borders[1]} "
+        if class_letter != '':
+            sql += f" AND class = '{class_letter}' "
+        elif week_day != '':
+            sql += f" AND day_of_week = '{week_day}' "
+        sql += "ORDER BY class, day_of_week, lesson_number ASC;"
         self.__cursor.execute(sql)
         response = self.__cursor.fetchall()  # получение последнего ID в time_table
         return response
