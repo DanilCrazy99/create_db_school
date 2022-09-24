@@ -152,7 +152,6 @@ class DataBase:
         if week_day != '':
             sql += f" AND day_of_week = '{week_day}' "
         sql += "ORDER BY class, day_of_week, lesson_number ASC;"
-        print('sql= ', sql)
         self.__cursor.execute(sql)
         response = self.__cursor.fetchall()  # получение последнего ID в time_table
         return response
