@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import psycopg2
 import Create_timetable
 from Create_Database.Config.Var_database import schoolName, user, password, host, port, path_timetable
@@ -46,13 +48,23 @@ def send_timetable(editor_id_vk='740705763'):
                                    f"VALUES ({without_brackets}) "
                                    )
         with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO timetable_time_activate ("
-                           "time_activate, "
-                           "editor_user_id, "
-                           "id_timetable) "
-                           f"VALUES ('{date_time}', '{editor_id_vk}', {id_first_timetable})"
-                           )
-            connection.commit()
+            if date_time is None:
+                date_time = datetime.today()
+                cursor.execute("INSERT INTO timetable_time_activate ("
+                               "time_activate, "
+                               "editor_user_id, "
+                               "id_timetable) "
+                               f"VALUES ('{date_time}', '{editor_id_vk}', {id_first_timetable})"
+                               )
+                connection.commit()
+            else:
+                cursor.execute("INSERT INTO timetable_time_activate ("
+                               "time_activate, "
+                               "editor_user_id, "
+                               "id_timetable) "
+                               f"VALUES ('{date_time}', '{editor_id_vk}', {id_first_timetable})"
+                               )
+                connection.commit()
     except Exception as _ex:
         print("[INFO] Error while working with PostgresQL", _ex)
     finally:
