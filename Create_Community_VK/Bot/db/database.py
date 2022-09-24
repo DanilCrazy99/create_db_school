@@ -96,3 +96,60 @@ class DataBase:
         self.__cursor.execute(sql, status_name)
         self.__connect.commit()
         logging.info(f'Удаление статуса {status_name}')
+
+    def current_schedule(self):
+        """
+        Получение начального и конечного ID таблицы timetable
+        :return: начальный и конечный id. Если таблица пуста присвоить значения 0
+        """
+        result = []
+        sql = "SELECT id, time_update, time_activate, editor_user_id, id_timetable " \
+              "FROM timetable_time_activate " \
+              "WHERE time_activate <= CURRENT_DATE ORDER BY time_activate DESC;"
+        self.__cursor.execute(sql)
+        response = self.__cursor.fetchone()
+        start_id = response[4]  # получение начала в таблице time_table
+        id_start_activate = response[0]
+        stop_id = self.next_post_id_activate(id_start_activate)  # получение окончания в таблице time_table
+
+        result.append(start_id)
+        result.append(stop_id)
+        return result
+
+    def next_post_id_activate(self, start_id):
+        """
+        Получение ID окончания данных залитого файла в таблице time_table
+        :param start_id: ID первой записи
+        :return: последняя запись
+        """
+        sql = f"SELECT id, id_timetable FROM timetable_time_activate WHERE id > {start_id} ORDER BY id_timetable ASC;"
+        self.__cursor.execute(sql)
+        stop_id = self.__cursor.fetchone()  # получение конца таблицы расписания в time_table
+        if stop_id:
+            # если есть записи после активного расписания
+            result = stop_id[1] - 1
+        else:
+            # если записей выше не нашло, то вытаскиваем MAX значение из таблицы time_table
+            sql = "SELECT MAX(id) FROM timetable;"
+            self.__cursor.execute(sql)
+            stop_id = self.__cursor.fetchone()  # получение последнего ID в time_table
+            result = stop_id[0]
+        return result
+
+    def select_time_table_activate(self, id_table_borders=[], class_letter='', week_day = ''):
+        """
+        получаем текущее активное расписание
+        :param id_table_borders: границы активного распиcания в таблице time_table
+        :return: список активного расписания
+        """
+        sql = "SELECT id, class, lesson_number, academic_discipline, day_of_week " \
+              "FROM timetable " \
+              f"WHERE id >= {id_table_borders[0]} AND id <= {id_table_borders[1]} "
+        if class_letter != '':
+            sql += f" AND class = '{class_letter}' "
+        elif week_day != '':
+            sql += f" AND day_of_week = '{week_day}' "
+        sql += "ORDER BY class, day_of_week, lesson_number ASC;"
+        self.__cursor.execute(sql)
+        response = self.__cursor.fetchall()  # получение последнего ID в time_table
+        return response
