@@ -62,6 +62,13 @@
           "label": "/вс"
         },
         "color": "negative"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "/всё"
+        },
+        "color": "secondary"
       }
     ]
   ]
