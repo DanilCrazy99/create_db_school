@@ -2,7 +2,7 @@ import openpyxl
 
 
 def create_timetable_list(path):
-    wb = openpyxl.load_workbook(path)
+    wb = openpyxl.load_workbook(path, data_only=True)
     sheet = wb.active
     # print(sheet[1][0].value)   A1    ABCDEFGHI  INDEX[ЦИФРА][БУКВА]
     # print(sheet[3][4].value)   E3    123456789
