@@ -109,7 +109,7 @@ class VkBot:
 
     # получение расписания на один день
     def daily_lesson_schedule(self, class_letter=['5Б'], week_day=['Вторник']):
-        data_timetable = self.db.select_timetable_class(class_letter=class_letter, week_day=week_day)
+        data_timetable = self.db.select_time_table_activate(class_letter=class_letter[0], week_day=week_day[0])
         str_table = ''
         circle = 0
         for data_week in data_timetable:
@@ -121,8 +121,10 @@ class VkBot:
 
         return str_table
 
-
     def start(self):
+        """
+        основной метод бота
+        """
         logging.info('Запущен основной цикл бота')
 
         try:
