@@ -103,7 +103,6 @@ class DataBase:
         :return: начальный и конечный id. Если таблица пуста присвоить значения 0
         """
         result = []
-        response =[]
         sql = "SELECT id, time_update, time_activate, editor_user_id, id_timetable " \
               "FROM timetable_time_activate " \
               "WHERE time_activate <= CURRENT_DATE ORDER BY time_activate DESC;"
@@ -136,3 +135,17 @@ class DataBase:
             stop_id = self.__cursor.fetchone()  # получение последнего ID в time_table
             result = stop_id[0]
         return result
+
+    def select_time_table_activate(self, id_table_borders=[]):
+        """
+        получаем текущее активное расписание
+        :param id_table_borders: границы активного распиcания в таблице time_table
+        :return:
+        """
+        sql = "SELECT id, class, lesson_number, academic_discipline, day_of_week " \
+              "FROM timetable " \
+              f"WHERE id >= {id_table_borders[0]} AND id <= {id_table_borders[1]} " \
+              f"ORDER BY class, day_of_week, lesson_number ASC;"
+        self.__cursor.execute(sql)
+        response = self.__cursor.fetchall()  # получение последнего ID в time_table
+        return response
