@@ -60,6 +60,7 @@ def generator_keyboard(role_id, one_time_method=False):
         keyboard.add_line()  # Переход на новую строку
         keyboard.add_button('/help', color=VkKeyboardColor.NEGATIVE)
         keyboard.add_button('/покинуть чат', color=VkKeyboardColor.NEGATIVE)
+
         result = keyboard.get_keyboard()
 
     elif role_id == 3:  # клавиатура выбора дня недели расписания
@@ -74,7 +75,12 @@ def generator_keyboard(role_id, one_time_method=False):
         keyboard.add_button('/пт', color=color_key())
         keyboard.add_button('/сб', color=color_key())
         keyboard.add_button('/вс', color=color_key())
-        keyboard.add_button('/exit', color=color_key())
+
+        keyboard.add_line()  # Переход на новую строку
+
+        keyboard.add_button('/меню выше')
+        keyboard.add_button('/важные контакты')
+
         result = keyboard.get_keyboard()
 
     elif role_id == 4:  # клавиатура завуча

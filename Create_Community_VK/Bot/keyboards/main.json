@@ -6,15 +6,6 @@
       {
         "action": {
           "type": "text",
-          "label": "Расписание на ..."
-        },
-        "color": "secondary"
-      }
-    ],
-    [
-      {
-        "action": {
-          "type": "text",
           "label": "/пн"
         },
         "color": "positive"
@@ -62,11 +53,20 @@
           "label": "/вс"
         },
         "color": "negative"
+      }
+    ],
+    [
+       {
+        "action": {
+          "type": "text",
+          "label": "/меню выше"
+        },
+        "color": "secondary"
       },
       {
         "action": {
           "type": "text",
-          "label": "/всё"
+          "label": "/важные контакты"
         },
         "color": "secondary"
       }

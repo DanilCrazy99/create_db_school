@@ -177,7 +177,8 @@ class VkBot:
                                 self.send_msg(message='Для работы с ботом необходимо состоять в чате своего класса.'
                                               , keyboard=gen_key(role_id=0))
 
-                            self.send_msg(message='Выберите день', keyboard=self.kb.get_keyboard('main'))
+                            self.send_msg(message='Запросите ссылки на доступные чаты классов школы.',
+                                          keyboard=gen_key(role_id=1))
                         else:
                             self.send_msg('Ваша команда не распознана.\nВоспользуйтесь'
                                           ' клавиатурой.', keyboard=self.kb.get_keyboard('main'))
