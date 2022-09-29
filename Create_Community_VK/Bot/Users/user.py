@@ -1,6 +1,9 @@
 import vk_api
 import requests
 from Create_Community_VK.Config.Var_community import token_group
+from Create_Community_VK.Bot.Group.group import Group
+
+group = Group()
 
 
 class Community:
@@ -17,18 +20,6 @@ class Community:
         self.getConversation_Mem = self.vk_api.messages.getConversationMembers  #
         self.getChatList = self.vk_api.messages.getConversations
         self.list_ids = []
-
-    def get_chats_ids(self):
-        """
-        Получаем ID чатов группы
-        :return: список ID чатов
-        """
-        list_items = self.getChatList()
-        list_ids = []
-        for a in range(len(list_items['items'])):
-            if list_items['items'][a]['conversation']['peer']['type'] == 'chat':
-                list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
-        return list_ids
 
     def get_members(self, id_chat):
         """
@@ -59,7 +50,7 @@ class Community:
         :param user_id:  ID пользователя в ВК
         :return: список ID чатов
         """
-        self.list_ids = self.get_chats_ids()
+        self.list_ids = group.get_chats_ids()
         chat_list_this_id = []
         for a in range(len(self.list_ids)):
             list_members = self.get_members(self.list_ids[a])
