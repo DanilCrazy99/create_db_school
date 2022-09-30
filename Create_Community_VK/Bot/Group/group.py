@@ -90,7 +90,9 @@ class Group:
                 number_level = a[0]
                 litter = a[1]
                 if str(level) == number_level and litter != level_litter:
-                    class_litter.append(a)
+                    link_extend = list(a)
+                    link_extend.append(self.get_link_chats(id_chat=a[3]))
+                    class_litter.append(link_extend)
                     level_litter = litter
         return class_litter
 
