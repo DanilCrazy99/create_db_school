@@ -74,7 +74,17 @@ class DataBase:
         self.__connect.commit()
         logging.info(f'Добавлен новый статус {status_name}')
 
-    # получение текущего состояния юзера в сервере статусов
+    def select_status(self, key_stat):
+        """
+        Получаем ID статуса по ключу статуса в таблице статусов
+        :param key_stat: int
+        :return: int
+        """
+        sql = f"SELECT id FROM public.status WHERE key_stats_1 = {key_stat};"
+        self.__cursor.execute(sql)
+        result = self.__cursor.fetchone()  # получение единичной записи
+        return result
+
     def select_user_status_server(self, user_id):
         """
         Получение текущего состояния юзера в сервере статуса
@@ -87,6 +97,40 @@ class DataBase:
         self.__cursor.execute(sql)
         result = self.__cursor.fetchone()  # получение единичной записи
         return result
+
+    def update_status_server(self, user_id, status_id):
+        """
+        Обновление статуса пользователя в таблице status_server
+        :param user_id: ID пользователя в ВК
+        :param status_id: ID устанавливаемого статуса из таблицы status
+        """
+        sql = "UPDATE status_server SET id_status=%s WHERE id_user_vk=%s;"
+        parameter = (status_id, user_id)
+        self.__cursor.execute(sql, parameter)
+        self.__connect.commit()
+
+    def select_key_stats_1(self, status_id):
+        """
+        Получаем INT значение статуса по его ID
+        :param status_id: ID статуса в таблице status
+        :return: int значение key_stats_1
+        """
+        sql = f"SELECT key_stats_1 FROM status WHERE id={status_id};"
+        self.__cursor.execute(sql)
+        result = self.__cursor.fetchone()  # получение единичной записи
+        return result
+
+    def insert_user_status_server(self, user_id_vk, status_id):
+        """
+        Добавление записи в БД по юзеру с указанием его текущего статуса
+        :param user_id_vk: идентификатор пользователя в ВК
+        :param status_id: ID статуса состояний юзера
+        """
+        sql = "INSERT INTO status_server(id_user_vk, id_status) VALUES (%s, %s);"
+        parameter = (user_id_vk, status_id)
+        self.__cursor.execute(sql, parameter)
+        self.__connect.commit()
+        logging.info(f'Изменен статус пользователя {user_id_vk} на {status_id}')
 
     # удаление описателя статуса
     def delete_status(self, status_name):
