@@ -71,6 +71,7 @@ def generator_keyboard(role_id, one_time_method=False):
                 for flow in list_flow:
                     step += 1
                     if step == 4:
+                        step = 0
                         keyboard.add_line()  # Переход на новую строку
                     caption_key = '/' + flow
                     keyboard.add_button(caption_key, color=VkKeyboardColor.POSITIVE)
@@ -78,16 +79,21 @@ def generator_keyboard(role_id, one_time_method=False):
         result = keyboard.get_keyboard()
 
     elif role_id == 3:  # клавиатура внутри потока и ссылками на чаты
-        list_litter_class = gr.litter_level_chat()
+        list_litter_class = gr.litter_level_chat(2)  # передать номер потока в int
         step = 0
         if list_litter_class:
-            step += 1
-            if step == 4:
-                keyboard.add_line()  # Переход на новую строку
-            caption_key = '/' + list_litter_class[2]
-            keyboard.add_button(caption_key, color=VkKeyboardColor.POSITIVE)
-
-        result = keyboard.get_keyboard()
+            for item in list_litter_class:
+                step += 1
+                if step == 2:  # максимальное число кнопок в ряду
+                    step = 0
+                    keyboard.add_line()  # Переход на новую строку
+                caption_key = '/ чат "' + item[2] + '" класса '
+                link_chat = gr.get_link_chats(item[3])
+                keyboard.add_openlink_button(label=caption_key, link=link_chat)
+            result = keyboard.get_keyboard()
+        else:
+            result = keyboard.get_empty_keyboard()  # пустая клавиатура
+            # необходимо вернуться на уровень выше по клавиатуре
 
     elif role_id == 4:  # клавиатура выбора дня недели расписания
         keyboard.add_button('/пн', color=color_key())
