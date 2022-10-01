@@ -87,6 +87,20 @@ class Community:
         result = self.db.select_key_stats_1(status_id=status_id)
         return result
 
+    def set_user_status_server(self, id_user_vk, id_status):
+        """
+        устанавливаем статус юзера в сервере состояний
+        :param id_user_vk: ID пользователя в ВК
+        :param id_status: ID статуса состояний по таблице status
+        """
+        # создать или обновить запись в сервере состояний
+        if self.db.select_user_status_server(user_id=id_user_vk):
+            # обновляем запись
+            self.db.update_status_server(user_id=id_user_vk, status_id=id_status)
+        else:
+            # создаём запись
+            self.db.insert_user_status_server(user_id_vk=id_user_vk, status_id=id_status)
+
     def get_xl_file_from_msg(self, id_editor=1640521):
         """
         Загрузка файла расписания
