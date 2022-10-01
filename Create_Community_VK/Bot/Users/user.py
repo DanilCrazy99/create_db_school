@@ -2,8 +2,7 @@ import vk_api
 import requests
 from Create_Community_VK.Config.Var_community import token_group
 from Create_Community_VK.Bot.Group.group import Group
-
-group = Group()
+from Create_Community_VK.Bot.db.database import DataBase
 
 
 class Community:
@@ -20,6 +19,8 @@ class Community:
         self.getConversation_Mem = self.vk_api.messages.getConversationMembers  #
         self.getChatList = self.vk_api.messages.getConversations
         self.list_ids = []
+        self.db = DataBase()
+        self.group = Group()
 
     def get_members(self, id_chat):
         """
@@ -33,7 +34,6 @@ class Community:
             list_members.append(list_items['items'][a]['member_id'])
         return list_members
 
-    # Получаем возраст пользователя. API с токеном пользователя
     def age_indicated(self, user_id):
         """
         Получить возраст пользователя
@@ -50,7 +50,7 @@ class Community:
         :param user_id:  ID пользователя в ВК
         :return: список ID чатов
         """
-        self.list_ids = group.get_chats_ids()
+        self.list_ids = self.group.get_chats_ids()
         chat_list_this_id = []
         for a in range(len(self.list_ids)):
             list_members = self.get_members(self.list_ids[a])
@@ -69,6 +69,23 @@ class Community:
             title = self.vk_api.messages.getConversationsById(peer_ids=items)
             list_chat_title.append(title['items'][0]['chat_settings']['title'])
         return list_chat_title
+
+    def get_user_status_server(self, id_user_vk):
+        """
+        Получение статуса юзера
+        :param id_user_vk: ID пользователя в ВК
+        :return: int номер статуса
+        """
+        if not self.db.select_user_status_server(user_id=id_user_vk):
+            # если записи нет то создаем с id_status у которой key_status_1 = 1
+            id_status = self.db.select_status(1)
+            # добавляем запись  в таблицу status_server
+            self.db.insert_user_status_server(user_id_vk=id_user_vk, status_id=id_status)
+            return id_status
+        # если запись есть достаем по iD статуса значение key_stats_1
+        status_id = self.db.select_user_status_server(user_id=id_user_vk)
+        result = self.db.select_key_stats_1(status_id=status_id)
+        return result
 
     def get_xl_file_from_msg(self, id_editor=1640521):
         """
