@@ -242,7 +242,7 @@ def db_main_tables(cursor):
         3 = Юзер не получал изменения расписания(синий)
     """
     cursor.execute("CREATE TABLE IF NOT EXISTS status(\
-        id integer NOT NULL PRIMARY KEY UNIQUE, \
+        id bigserial NOT NULL PRIMARY KEY, \
         status_member text NOT NULL, \
         key_stats_1 integer DEFAULT 0, \
         key_stats_2 integer DEFAULT 0, \
