@@ -148,16 +148,16 @@ class VkBot:
                         self.from_id = event.obj['message']['from_id']
 
                         list_chat_title =[]
-                        self.community.get_xl_file_from_msg()
+                        self.community.get_xl_file_from_msg()  # проверка на право загрузки файла расписания
 
                         if self.from_id < 0:
                             # прерываем если пришло сообщение от группы
                             continue
 
                         if self.new_msg == 'расписание на ...':
-                            print('расписание на ...')
                             self.send_msg('за какой день хотите узнать'
                                           ' расписание?', keyboard=gen_key(role_id=1))
+
                         elif self.new_msg in list_week_day:
                             list_chat_title = self.community.title_chat(user_id=self.from_id)
                             tmp_list_title = []
@@ -175,10 +175,16 @@ class VkBot:
                                 tmp_list_title.clear()
                             if cicle == 0:
                                 self.send_msg(message='Для работы с ботом необходимо состоять в чате своего класса.'
-                                              , keyboard=gen_key(role_id=0))
+                                              , keyboard=gen_key(role_id=3))  # очистка клавы
+                                continue
 
-                            self.send_msg(message='Запросите ссылки на доступные чаты классов школы.',
-                                          keyboard=gen_key(role_id=1))
+                            self.send_msg(message='Выберете день недели.',
+                                          keyboard=gen_key(role_id=4))
+
+                        elif self.new_msg == '/меню выше':
+                            # получить состояние юзера от сервера состояний
+                            pass
+
                         else:
                             # подгрузить клавиатуру согласно сервера состояния
                             self.send_msg('Ваша команда не распознана.\nВоспользуйтесь'
