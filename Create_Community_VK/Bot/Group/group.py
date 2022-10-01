@@ -21,6 +21,18 @@ class Group:
         self.getChatList = self.vk_api.messages.getConversations
         self.list_ids = []
 
+    def get_chats_ids(self):
+        """
+        Получаем ID чатов группы
+        :return: список ID чатов
+        """
+        list_items = self.getChatList()
+        list_ids = []
+        for a in range(len(list_items['items'])):
+            if list_items['items'][a]['conversation']['peer']['type'] == 'chat':
+                list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
+        return list_ids
+
     def get_chats(self):
         """
         Получаем список чатов группы
