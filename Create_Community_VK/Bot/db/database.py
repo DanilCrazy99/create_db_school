@@ -221,7 +221,7 @@ class DataBase:
 
         :param id_role: int Не обязательный
         :param name_role: str Не обязательный
-        :return: list содержит кортежи с данными
+        :return: list содержит кортеж(и) с данными
         """
         sql = f"SELECT id, role, description FROM public.role"
         if not name_role and not id_role:
