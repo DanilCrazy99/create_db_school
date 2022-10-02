@@ -24,7 +24,7 @@ class DataBase:
         Создание параметра запроса для WHERE с условием AND
         :param sql: начальная часть запроса с WHERE
         :param parameters: именованный словарь с условиями. пример: {"поле_БД": переменная по которой будет выборка}
-        :return: строка SQL запроса и кортеж из параметров
+        :return: строка SQL запроса и словарь из параметров
         """
         sql += " AND ".join([
             f"{item} = %s" for item in parameters
@@ -69,6 +69,10 @@ class DataBase:
 
     # добавление описателя статуса
     def insert_status_name(self, status_name):
+        """
+        Добавляет новый статус в таблицу status
+        :param status_name: описание статуса
+        """
         sql = "INSERT INTO status(status) VALUES (%s);"
         self.__cursor.execute(sql, status_name)
         self.__connect.commit()
