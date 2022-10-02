@@ -14,12 +14,20 @@ from Create_Community_VK.Config.Var_community import group_id
 from Create_Community_VK.Bot.keyboard import Keyboards
 from Create_Community_VK.Bot.db.database import DataBase
 from Create_Community_VK.Bot.Users.user import Community
+from Create_Community_VK.Bot.Group.group import Group
 from Create_Community_VK.Config.control_word import list_week_day, control_word, list_week_words, list_month_words
+from Create_Community_VK.Config.msg_default import hot_contact, help_user_chat_member, help_user_no_chat
 from Create_Community_VK.Bot.keyboards.keyboard import generator_keyboard as gen_key
 
 
 class MyLongPoll(VkBotLongPoll):
+    """
+    Переопределяем метод Listen родителя
+    """
     def listen(self):
+        """
+        Отрабатываем разрывание соединения сервером
+        """
         while True:
             try:
                 for event in self.check():
@@ -49,6 +57,7 @@ class VkBot:
         self.header_timetable = ''
         self.kb = Keyboards()
         self.db = DataBase()
+        self.group = Group()
         self.community = Community()
 
 # Отправка сообщения пользователю (+ вложение + клавиатура)
@@ -121,6 +130,20 @@ class VkBot:
 
         return str_table
 
+    def msg_help(self, user_id):
+        """
+        Обработка сообщения help
+        """
+        if self.community.check_is_member_chat(user_id=user_id):
+            # если член чата, то help низкого уровня
+            msg = help_user_chat_member
+        else:
+            # если не член чата, то help как вступить в чат
+            msg = help_user_no_chat
+
+        # отправить клавиатуру с кнопкой "назад"
+        self.send_msg('Справка по работе с меню:'+msg, keyboard=gen_key(role_id=10))
+
     def start(self):
         """
         основной метод бота
@@ -129,7 +152,7 @@ class VkBot:
 
         try:
             for event in self.long_poll.listen():
-                print('входное сообщение: ', event)
+                # print('входное сообщение: ', event)
                 # обработка поступившего личного сообщения
                 if event.type == VkBotEventType.MESSAGE_NEW:
                     self.new_msg = self.correct_msg(event.obj['message']['text'])
@@ -147,21 +170,44 @@ class VkBot:
                         # кто отправил сообщение
                         self.from_id = event.obj['message']['from_id']
 
-                        list_chat_title =[]
-                        self.community.get_xl_file_from_msg()  # проверка на право загрузки файла расписания
-
                         if self.from_id < 0:
                             # прерываем если пришло сообщение от группы
                             continue
+
+                        # отработка команды help
+                        if self.new_msg == '/help':
+                            self.msg_help(user_id=self.from_id)
+                            continue
+
+                        # отработка команды "важные контакты"
+                        if self.new_msg == '/важные контакты':
+                            self.send_msg(message=hot_contact
+                                          , keyboard=gen_key(role_id=4))
+                            continue
+
+                        # проверка на участие в группе
+                        if not self.group.member_group(id_user=self.from_id):
+                            continue  # прерываем если не член группы
+
+                        list_chat_title =[]
+                        self.community.get_xl_file_from_msg()  # проверка на право загрузки файла расписания
+
+                        # Проверяем пользователя на участие в чатах.
+                        # Если он не имеет роли в ВК и не участник чата, то заносим его в БД cтатус visitor
+
+                        # получаем статус пользователя в сервере состояний
+                        key_status = self.community.get_user_status_server(id_user_vk=self.from_id)
+
+                        role_user = ''
 
                         if self.new_msg == 'расписание на ...':
                             self.send_msg('за какой день хотите узнать'
                                           ' расписание?', keyboard=gen_key(role_id=1))
 
-                        elif self.new_msg in list_week_day:
+                        elif self.new_msg in list_week_day:  # обработка по расписанию
                             list_chat_title = self.community.title_chat(user_id=self.from_id)
                             tmp_list_title = []
-                            cicle = 0
+                            cicle = 0  # счетчик чатов в которых состоит пользователь
                             for item_chat_title in list_chat_title:
                                 cicle += 1
                                 tmp_list_title.append(item_chat_title)
@@ -173,7 +219,8 @@ class VkBot:
                                 self.send_msg(message=msg_tmp, keyboard=self.kb.get_keyboard('clear'))
                                 # очищаем список title чатов
                                 tmp_list_title.clear()
-                            if cicle == 0:
+                            if cicle == 0:  # если он ни где не состоит, то проверить сервер состояний и выдать клаву
+
                                 self.send_msg(message='Для работы с ботом необходимо состоять в чате своего класса.'
                                               , keyboard=gen_key(role_id=3))  # очистка клавы
                                 continue
