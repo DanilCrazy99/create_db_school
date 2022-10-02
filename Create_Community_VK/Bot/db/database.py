@@ -225,3 +225,18 @@ class DataBase:
         self.__cursor.execute(sql)
         result = self.__cursor.fetchone()
         return result
+
+    def insert_role(self, role_name, role_desc=''):
+        """
+        Добавляем новую роль
+        :param role_name: str имя роли
+        :param role_desc: str описание роли
+        :return: ID новой роли
+        """
+        parameter = (role_name, role_desc)
+        sql = "INSERT INTO role(role, description) VALUES (%s, %s) RETURNING id;"
+        self.__cursor.execute(sql, parameter)
+        result = self.__cursor.fetchone()
+        self.__connect.commit()
+        logging.info(f'Добавлена новая роль {role_name}')
+        return result
