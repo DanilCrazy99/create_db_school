@@ -203,3 +203,25 @@ class DataBase:
         self.__cursor.execute(sql)
         response = self.__cursor.fetchall()  # получение последнего ID в time_table
         return response
+
+    def select_user_data(self, id_user_vk):
+        """
+        Получение данных по пользователю из таблицы users
+        :param id_user_vk: ID пользователя ВК
+        :return: list(role_id, invitation_sent, time_unanswered_msg)
+        """
+        sql = f"SELECT role_id, invitation_sent, time_unanswered_msg FROM users WHERE user_id_vk={id_user_vk};"
+        self.__cursor.execute(sql)
+        result = self.__cursor.fetchone()
+        return result
+
+    def select_role_data(self, id_role):
+        """
+        Получение описания роли по её ID
+        :param id_role: int
+        :return: list
+        """
+        sql = f"SELECT id, role, description FROM public.role WHERE id={id_role};"
+        self.__cursor.execute(sql)
+        result = self.__cursor.fetchone()
+        return result
