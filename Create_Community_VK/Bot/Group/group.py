@@ -108,3 +108,17 @@ class Group:
                     level_litter = litter
         return class_litter
 
+    def member_group(self, id_user):
+        """
+        Проверка на участие в нашей группе
+        :return: True / False
+        """
+        if group_id != id_user and group_id != (-1 * id_user):
+            result = self.vk.method('groups.isMember', {'group_id': group_id,
+                                                        'user_id': id_user})
+        else:
+            result = 1
+
+        if result == 1:
+            return True
+        return False
