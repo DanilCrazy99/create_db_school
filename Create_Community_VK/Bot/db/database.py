@@ -95,7 +95,7 @@ class DataBase:
         :param user_id: идентификатор пользователя в ВК
         :return: возвращает описание статуса и id статуса
         """
-        sql = "SELECT status_server.id_status, status.status " \
+        sql = "SELECT status_server.id_status, status.status_member " \
               "FROM status_server INNER JOIN status ON status_server.id_status=status.id " \
               f"WHERE status_server.id_user_vk={user_id};"
         self.__cursor.execute(sql)
