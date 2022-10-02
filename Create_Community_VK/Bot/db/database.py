@@ -244,10 +244,15 @@ class DataBase:
         :param role_desc: str описание роли
         :return: ID новой роли
         """
-        parameter = (role_name, role_desc)
-        sql = "INSERT INTO role(role, description) VALUES (%s, %s) RETURNING id;"
-        self.__cursor.execute(sql, parameter)
-        result = self.__cursor.fetchone()
-        self.__connect.commit()
-        logging.info(f'Добавлена новая роль {role_name}')
+        # проверяем существование роли в таблице role
+        check = self.select_role_data(name_role=role_name)
+        if check:
+            result = check[0][0]
+        else:
+            parameter = (role_name, role_desc)
+            sql = "INSERT INTO role(role, description) VALUES (%s, %s) RETURNING id;"
+            self.__cursor.execute(sql, parameter)
+            result = self.__cursor.fetchone()[0]
+            self.__connect.commit()
+            logging.info(f'Добавлена новая роль {role_name}')
         return result
