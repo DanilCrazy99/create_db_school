@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 # файл генерации клавиатур
 
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
