@@ -215,15 +215,26 @@ class DataBase:
         result = self.__cursor.fetchone()
         return result
 
-    def select_role_data(self, id_role):
+    def select_role_data(self, id_role=None, name_role=None):
         """
-        Получение описания роли по её ID
-        :param id_role: int
-        :return: list
+        Получение описания роли по её ID или Name
+
+        :param id_role: int Не обязательный
+        :param name_role: str Не обязательный
+        :return: list содержит кортежи с данными
         """
-        sql = f"SELECT id, role, description FROM public.role WHERE id={id_role};"
+        sql = f"SELECT id, role, description FROM public.role"
+        if not name_role and not id_role:
+            sql += ';'
+
+        if name_role:
+            sql += f" WHERE role='{name_role}';"
+
+        # Если имя роли было пустым, то выборка по ID
+        if id_role and not name_role:
+            sql += f" WHERE id={id_role};"
         self.__cursor.execute(sql)
-        result = self.__cursor.fetchone()
+        result = self.__cursor.fetchall()
         return result
 
     def insert_role(self, role_name, role_desc=''):
