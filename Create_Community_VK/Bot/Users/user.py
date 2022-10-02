@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import vk_api
 import requests
 from Create_Community_VK.Config.Var_community import token_group
@@ -72,7 +73,7 @@ class Community:
 
     def get_user_status_server(self, id_user_vk):
         """
-        Получение статуса юзера
+        Получение статуса юзера в таблице status_server
         :param id_user_vk: ID пользователя в ВК
         :return: int номер статуса
         """
@@ -83,7 +84,7 @@ class Community:
             self.db.insert_user_status_server(user_id_vk=id_user_vk, status_id=id_status)
             return id_status
         # если запись есть достаем по iD статуса значение key_stats_1
-        status_id = self.db.select_user_status_server(user_id=id_user_vk)
+        status_id = self.db.select_user_status_server(user_id=id_user_vk)[0]
         result = self.db.select_key_stats_1(status_id=status_id)
         return result
 
