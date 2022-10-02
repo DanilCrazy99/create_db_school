@@ -131,6 +131,10 @@ def generator_keyboard(role_id, one_time_method=False):
         keyboard.add_button('/удалить загрузку', color=VkKeyboardColor.NEGATIVE)
         result = keyboard.get_keyboard()
 
+    elif role_id == 10:  # клавиатура с кнопкой назад
+        keyboard.add_button('/назад', color=VkKeyboardColor.POSITIVE)
+        result = keyboard.get_keyboard()
+
     else:  # очистка от всех клавиатур
         result = keyboard.get_empty_keyboard()
     return result
