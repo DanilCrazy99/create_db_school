@@ -157,6 +157,26 @@ class VkBot:
                 if event.type == VkBotEventType.MESSAGE_NEW:
                     self.new_msg = self.correct_msg(event.obj['message']['text'])
 
+                    # кто отправил сообщение
+                    self.from_id = event.obj['message']['from_id']
+
+                    if self.from_id < 0:
+                        # прерываем если пришло сообщение от группы
+                        continue
+
+                    # проверка на участие в группе
+                    if not self.group.member_group(id_user=self.from_id):
+                        self.send_msg(message='Пожалуйста вступите в нашу группу.'
+                                              '\nЗарегистрируйтесь в чате своего класса.'
+                                      , keyboard=gen_key())
+                        continue  # прерываем т.к. не член группы
+
+                    # Проверить на участие в чатах. Если не участник. Передать клаву выбора действий.
+                    if not self.community.check_is_member_chat(user_id=self.from_id):
+                        self.send_msg(message='Выберите действие.'
+                                      , keyboard=gen_key(1))
+                        continue  # прерываем т.к. не член чата
+
                     # обработка присоединённого файла
                     if len(event.obj['message']['attachments']) != 0:
                         ext_file = event.obj['message']['attachments'][0]['doc']['ext']
@@ -167,12 +187,6 @@ class VkBot:
 
                     # проверка на наличие обрабатываемого сообщения
                     if self.new_msg in control_word:
-                        # кто отправил сообщение
-                        self.from_id = event.obj['message']['from_id']
-
-                        if self.from_id < 0:
-                            # прерываем если пришло сообщение от группы
-                            continue
 
                         # отработка команды help
                         if self.new_msg == '/help':
@@ -185,9 +199,11 @@ class VkBot:
                                           , keyboard=gen_key(role_id=4))
                             continue
 
-                        # проверка на участие в группе
-                        if not self.group.member_group(id_user=self.from_id):
-                            continue  # прерываем если не член группы
+                        # отработка команды "назад"
+                        if self.new_msg == '/важные контакты':
+                            self.send_msg(message=hot_contact
+                                          , keyboard=gen_key(role_id=4))
+                            continue
 
                         list_chat_title =[]
                         self.community.get_xl_file_from_msg()  # проверка на право загрузки файла расписания
