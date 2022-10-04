@@ -45,6 +45,32 @@ class Community:
         print('info =', info)
         pass
 
+    def user_role_in_group(self, user_id):
+        """
+        Получение роли пользователя в группе или роль visitor
+
+        :param user_id: int ID юзера в ВК
+        :return: str название роли
+        """
+        result = self.group.admins_group()
+        for item in result:
+            if item['id'] == user_id:
+                role = item['role']
+                return role
+        return 'visitor'
+
+    def create_user(self, user_id):
+        """
+        Создание/сохранение данных о новом юзере
+
+        :param user_id: int ID пользователя в ВК
+        :return: int ID пользователя в БД
+        """
+
+        role_id = self.db.select_id_role(role=self.user_role_in_group(user_id=user_id))
+        result = self.db.insert_user(user_id=user_id, role_id=role_id)
+        return result
+
     def check_is_member_chat(self, user_id):
         """
         Получение ID где состоит пользователь
