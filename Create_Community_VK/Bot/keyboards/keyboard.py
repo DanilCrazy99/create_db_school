@@ -41,18 +41,22 @@ def example_keyboard():
     # )
 
 
-def generator_keyboard(role_id, one_time_method=False):
+def generator_keyboard(role_id=100, one_time_method=False):
     """
     Генератор клавиатуры согласно роли пользователя в группе.
 
-    :param role_id: Роль пользователя в группе
+    :param role_id: Роль пользователя в группе.По умолчанию пустая клавиатура.
     :param one_time_method: Метод отправки клавиатуры Inline=True или стандартная=False
     :return: keyboard формат ответа json строка
     """
     result = {}
     keyboard = VkKeyboard(one_time=one_time_method)
 
-    if role_id == 1:  # клавиатура начального входа без роли
+    if role_id == 0:  # клавиатура не участника группы
+        keyboard.add_button('/Вступить в группу', color=VkKeyboardColor.POSITIVE)
+        result = keyboard.get_keyboard()
+
+    elif role_id == 1:  # клавиатура начального входа без роли
         keyboard.add_button('/начальные классы', color=VkKeyboardColor.POSITIVE)
         keyboard.add_line()  # Переход на новую строку
         keyboard.add_button('/старшие классы', color=VkKeyboardColor.POSITIVE)
