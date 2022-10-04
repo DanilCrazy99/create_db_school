@@ -122,3 +122,13 @@ class Group:
         if result == 1:
             return True
         return False
+
+    def admins_group(self):
+        """
+        Достает список админов группы
+        :return: list
+        """
+        result = self.vk.method("groups.getMembers", {'group_id': group_id,
+                                                      'filter': 'managers'})
+        # достаем список админов группы
+        return result['items']
