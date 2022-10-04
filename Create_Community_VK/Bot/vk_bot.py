@@ -60,8 +60,14 @@ class VkBot:
         self.group = Group()
         self.community = Community()
 
-# Отправка сообщения пользователю (+ вложение + клавиатура)
     def send_msg(self, message, attachment: list = [], keyboard=None):
+        """
+        Отправка сообщения пользователю (+ вложение + клавиатура)
+
+        :param message: str Сообщение пользователю.
+        :param attachment: Список присоединенных файлов
+        :param keyboard: Сформированная клавиатура в json
+        """
         # print('отправка лс')
         parameters = {'message': message,
                       'keyboard': keyboard,
@@ -166,9 +172,17 @@ class VkBot:
 
                     # проверка на участие в группе
                     if not self.group.member_group(id_user=self.from_id):
-                        self.send_msg(message='Пожалуйста вступите в нашу группу.'
-                                              '\nЗарегистрируйтесь в чате своего класса.'
-                                      , keyboard=gen_key())
+                        # Сохраняем в БД данные по пользователю.
+                        user_id_db = self.community.create_user(user_id=self.from_id)
+
+                        # проверяем флаг отправки приглашения вступить в группу
+                        if not self.db.select_invitation_msg_user(user_id_db=user_id_db):
+                            msg = 'Пожалуйста вступите в нашу группу.' \
+                                  '\nЗарегистрируйтесь в чате своего класса.'
+                            # обновляем статус отправки сообщения на True
+                            self.db.update_invitation_msg_user(user_id_db=user_id_db)
+                            self.send_msg(message=msg, keyboard=gen_key(0))
+
                         continue  # прерываем т.к. не член группы
 
                     # Проверить на участие в чатах. Если не участник. Передать клаву выбора действий.
@@ -250,8 +264,8 @@ class VkBot:
 
                         else:
                             # подгрузить клавиатуру согласно сервера состояния
-                            self.send_msg('Ваша команда не распознана.\nВоспользуйтесь'
-                                          ' клавиатурой.', keyboard=self.kb.get_keyboard('main'))
+                            self.send_msg('Ваша команда не распознана.\nВоспользуйтесь клавиатурой.'
+                                          , keyboard=self.kb.get_keyboard('main'))
 
         except requests.exceptions.ReadTimeout:
             error_msg = traceback.format_exc()
