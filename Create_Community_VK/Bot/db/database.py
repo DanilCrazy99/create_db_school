@@ -89,6 +89,115 @@ class DataBase:
         result = self.__cursor.fetchone()  # получение единичной записи
         return result
 
+    def select_user(self, user_id):
+        """
+        Получение текущего данных юзера.
+
+        :param user_id: идентификатор пользователя в ВК
+        :return: возвращает данные по юзеру
+        """
+        sql = f"SELECT user_id_vk, role_id, invitation_sent, time_unanswered_msg " \
+              f"FROM users WHERE user_id_vk={user_id};"
+        self.__cursor.execute(sql)
+        result = self.__cursor.fetchone()  # получение единичной записи
+        return result
+
+    def insert_user(self, user_id, role_id):
+        """
+        Добавление данных нового юзера.
+
+        :param user_id: идентификатор пользователя в ВК
+        :param role_id: идентификатор роли в БД
+        :return: возвращает ID юзера в БД
+        """
+        # проверка на наличие в БД юзера с пришедшим ID
+        result = self.select_user(user_id=user_id)
+        if not result:
+            sql = "INSERT INTO users(user_id_vk, role_id, invitation_sent) VALUES (%s, %s, %s) RETURNING id;"
+            # параметр invitation_sent в этом случае ставим в True (отправлено)
+            invitation = False
+            parameter = (user_id, role_id, invitation)
+            self.__cursor.execute(sql, parameter)
+            id_user_db = self.__cursor.fetchone()[0]
+            self.__connect.commit()
+            logging.info(f'У нас новый член группы id={user_id}')
+            return id_user_db
+        else:  # иначе обновляем данные по юзеру
+            self.update_user(user_id_vk=user_id, role_id=role_id)
+            id_user_db = self.select_user_data(id_user_vk=user_id)
+            return id_user_db[0]
+
+    def select_invitation_msg_user(self, user_id_db):
+        """
+        Получение статуса контроля отправки приглашения вступления в группу
+        :param user_id_db: int ID пользователя в БД
+        :return: bool Статус отправки приглашения
+        """
+        sql = f"SELECT invitation_sent FROM public.users WHERE id={user_id_db};"
+        self.__cursor.execute(sql)
+        result = self.__cursor.fetchone()[0]  # получение единичной записи
+        return result
+
+    def update_invitation_msg_user(self, user_id_db):
+        """
+        Меняем статус отправки приглашения вступления в группу на TRUE
+
+        :param user_id_db: int ID пользователя в БД
+        """
+        sql = f"UPDATE users SET invitation_sent=True WHERE id={user_id_db};"
+        self.__cursor.execute(sql)
+        self.__connect.commit()
+
+    def update_user(self, user_id_vk, role_id):
+        """
+        Обновление данных пользователя
+
+        :param user_id_vk: ID юзера в ВК
+        :param role_id: ID роли в БД
+        :return: возвращает ID юзера в БД
+        """
+        sql = "UPDATE users SET role_id=%s WHERE user_id_vk=%s;"
+        parameter = (role_id, user_id_vk)
+        self.__cursor.execute(sql, parameter)
+        self.__connect.commit()
+
+    def select_id_role(self, role):
+        """
+        Получение ID роли пользователя согласно БД
+
+        :param role: str Роль юзера в группе
+        :return: int ID роли в БД.
+        """
+        sql = f"SELECT id, role, description FROM role WHERE role='{role}';"
+        self.__cursor.execute(sql)
+        request = self.__cursor.fetchone()  # получение единичной записи
+        if not request:
+            # Добавляем новую роль
+            result = self.insert_role(role_name=role)
+        else:
+            result = request[0]
+        return result
+
+    def insert_role(self, role_name, role_desc=''):
+        """
+        Добавляем новую роль
+        :param role_name: str имя роли
+        :param role_desc: str описание роли
+        :return: ID новой роли
+        """
+        # проверяем существование роли в таблице role
+        check = self.select_role_data(name_role=role_name)
+        if check:
+            result = check[0][0]
+        else:
+            parameter = (role_name, role_desc)
+            sql = "INSERT INTO role(role, description) VALUES (%s, %s) RETURNING id;"
+            self.__cursor.execute(sql, parameter)
+            result = self.__cursor.fetchone()[0]
+            self.__connect.commit()
+            logging.info(f'Добавлена новая роль {role_name}')
+        return result
+
     def select_user_status_server(self, user_id):
         """
         Получение текущего состояния юзера в сервере статуса
@@ -138,8 +247,11 @@ class DataBase:
 
     # удаление описателя статуса
     def delete_status(self, status_name):
-        # проверка использования статуса в таблице сервера состояний
+        """
+        Проверка использования статуса в таблице сервера состояний.
 
+        :param status_name: str Имя статуса.
+        """
         sql = "DELETE FROM status WHERE id = %s;"
         self.__cursor.execute(sql, status_name)
         self.__connect.commit()
@@ -235,24 +347,4 @@ class DataBase:
             sql += f" WHERE id={id_role};"
         self.__cursor.execute(sql)
         result = self.__cursor.fetchall()
-        return result
-
-    def insert_role(self, role_name, role_desc=''):
-        """
-        Добавляем новую роль
-        :param role_name: str имя роли
-        :param role_desc: str описание роли
-        :return: ID новой роли
-        """
-        # проверяем существование роли в таблице role
-        check = self.select_role_data(name_role=role_name)
-        if check:
-            result = check[0][0]
-        else:
-            parameter = (role_name, role_desc)
-            sql = "INSERT INTO role(role, description) VALUES (%s, %s) RETURNING id;"
-            self.__cursor.execute(sql, parameter)
-            result = self.__cursor.fetchone()[0]
-            self.__connect.commit()
-            logging.info(f'Добавлена новая роль {role_name}')
         return result
