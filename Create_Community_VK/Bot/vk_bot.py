@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from Create_Community_VK.Config.token import token_group
 from Create_Community_VK.Config.Var_community import group_id
-from Create_Community_VK.Bot.keyboard import Keyboards
 from Create_Community_VK.Bot.db.database import DataBase
 from Create_Community_VK.Bot.Users.user import Community
 from Create_Community_VK.Bot.Group.group import Group
@@ -39,6 +38,9 @@ class MyLongPoll(VkBotLongPoll):
 
 
 class VkBot:
+    """
+    Класс бота
+    """
     def __init__(self):
         # для longpoll
         __api_token = token_group
@@ -55,7 +57,6 @@ class VkBot:
         self.from_id = 0
         self.new_msg = ''
         self.header_timetable = ''
-        self.kb = Keyboards()
         self.db = DataBase()
         self.group = Group()
         self.community = Community()
@@ -77,12 +78,22 @@ class VkBot:
         self.vk.method('messages.send', parameters)
 
     def correct_msg(self, msg):
-        # переводим сообщение в нижний регистр и удаляем пробелы в начале и в конце строки
+        """
+        Переводим сообщение в нижний регистр и удаляем пробелы в начале и в конце строки
+
+        :param msg: строка
+        :return: str
+        """
         tmp_str = msg.lower().strip()
         return tmp_str
 
-    # формируем шапку расписания. return = день недели для SQL запроса
     def date_words(self, input_week_day):
+        """
+        Формируем шапку расписания.
+
+        :param input_week_day: День недели (вида "вт")
+        :return: день недели для SQL запроса (вида "Вторник")
+        """
         today = datetime.today()
         result_word = []
         week_words = list_week_words
@@ -113,7 +124,7 @@ class VkBot:
             day_week = week_words[tomorrow_week_day]
         number_month = int(tomorrow.strftime('%m'))
 
-       # формируем шапку расписания на день
+        # формируем шапку расписания на день
         self.header_timetable = f'на {day_week}, {tomorrow.strftime("%d")} ' \
                                 f'{month_words[number_month]} ' \
                                 f'{tomorrow.strftime("%Y")}г'
@@ -122,8 +133,13 @@ class VkBot:
         result_word.append(week_words[tomorrow_week_day].capitalize())
         return result_word
 
-    # получение расписания на один день
     def daily_lesson_schedule(self, class_letter=['5Б'], week_day=['Вторник']):
+        """
+        Получение расписания на один день
+        :param class_letter: list Название классов школы в str
+        :param week_day: str день недели(вида "Вторник")
+        :return:
+        """
         data_timetable = self.db.select_time_table_activate(class_letter=class_letter[0], week_day=week_day[0])
         str_table = ''
         circle = 0
@@ -152,7 +168,7 @@ class VkBot:
 
     def start(self):
         """
-        основной метод бота
+        Основной метод бота
         """
         logging.info('Запущен основной цикл бота')
 
@@ -170,6 +186,11 @@ class VkBot:
                         # прерываем если пришло сообщение от группы
                         continue
 
+                    # отработка команды help
+                    if self.new_msg == '/help':
+                        self.msg_help(user_id=self.from_id)
+                        continue
+
                     # проверка на участие в группе
                     if not self.group.member_group(id_user=self.from_id):
                         # Сохраняем в БД данные по пользователю.
@@ -182,13 +203,13 @@ class VkBot:
                             # обновляем статус отправки сообщения на True
                             self.db.update_invitation_msg_user(user_id_db=user_id_db)
                             self.send_msg(message=msg, keyboard=gen_key(0))
+                        continue  # Прерываем т.к. не член группы
 
-                        continue  # прерываем т.к. не член группы
-
-                    # Проверить на участие в чатах. Если не участник. Передать клаву выбора действий.
+                    # Проверить на участие в чатах. Если не участник. Передать клавиатуру выбора действий.
                     if not self.community.check_is_member_chat(user_id=self.from_id):
                         self.send_msg(message='Выберите действие.'
                                       , keyboard=gen_key(1))
+                        # обновляем в БД роль на user
                         continue  # прерываем т.к. не член чата
 
                     # обработка присоединённого файла
@@ -202,11 +223,6 @@ class VkBot:
                     # проверка на наличие обрабатываемого сообщения
                     if self.new_msg in control_word:
 
-                        # отработка команды help
-                        if self.new_msg == '/help':
-                            self.msg_help(user_id=self.from_id)
-                            continue
-
                         # отработка команды "важные контакты"
                         if self.new_msg == '/важные контакты':
                             self.send_msg(message=hot_contact
@@ -219,7 +235,6 @@ class VkBot:
                                           , keyboard=gen_key(role_id=4))
                             continue
 
-                        list_chat_title =[]
                         self.community.get_xl_file_from_msg()  # проверка на право загрузки файла расписания
 
                         # Проверяем пользователя на участие в чатах.
@@ -228,8 +243,6 @@ class VkBot:
                         # получаем статус пользователя в сервере состояний
                         key_status = self.community.get_user_status_server(id_user_vk=self.from_id)
 
-                        role_user = ''
-
                         if self.new_msg == 'расписание на ...':
                             self.send_msg('за какой день хотите узнать'
                                           ' расписание?', keyboard=gen_key(role_id=1))
@@ -237,35 +250,24 @@ class VkBot:
                         elif self.new_msg in list_week_day:  # обработка по расписанию
                             list_chat_title = self.community.title_chat(user_id=self.from_id)
                             tmp_list_title = []
-                            cicle = 0  # счетчик чатов в которых состоит пользователь
                             for item_chat_title in list_chat_title:
-                                cicle += 1
                                 tmp_list_title.append(item_chat_title)
 
                                 self.date_words(self.new_msg)
                                 msg_tmp = f'{self.header_timetable}\nкласс: {item_chat_title}' \
                                           f'{self.daily_lesson_schedule(class_letter=tmp_list_title, week_day=self.date_words(self.new_msg))}'
 
-                                self.send_msg(message=msg_tmp, keyboard=self.kb.get_keyboard('clear'))
+                                self.send_msg(message=msg_tmp)
                                 # очищаем список title чатов
                                 tmp_list_title.clear()
-                            if cicle == 0:  # если он ни где не состоит, то проверить сервер состояний и выдать клаву
-
-                                self.send_msg(message='Для работы с ботом необходимо состоять в чате своего класса.'
-                                              , keyboard=gen_key(role_id=3))  # очистка клавы
-                                continue
-
-                            self.send_msg(message='Выберете день недели.',
-                                          keyboard=gen_key(role_id=4))
 
                         elif self.new_msg == '/меню выше':
                             # получить состояние юзера от сервера состояний
                             pass
 
                         else:
-                            # подгрузить клавиатуру согласно сервера состояния
-                            self.send_msg('Ваша команда не распознана.\nВоспользуйтесь клавиатурой.'
-                                          , keyboard=self.kb.get_keyboard('main'))
+                            # подгрузить клавиатуру согласно серверу состояния
+                            self.send_msg('Ваша команда не распознана.\nВоспользуйтесь клавиатурой.')
 
         except requests.exceptions.ReadTimeout:
             error_msg = traceback.format_exc()

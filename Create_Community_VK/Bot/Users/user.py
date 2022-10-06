@@ -12,8 +12,7 @@ class Community:
     """
     def __init__(self, token_in_class=token_group):
         # присваиваю переменной token токен группы
-        self.__token = token_in_class
-        self.vk = vk_api.VkApi(token=self.__token)
+        self.vk = vk_api.VkApi(token=token_in_class)
         # используем .vk_api() для вызова API
         self.vk_api = self.vk.get_api()
         # self.id_chat = ''
