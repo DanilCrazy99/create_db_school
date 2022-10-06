@@ -58,8 +58,9 @@ def generator_keyboard(role_id=100, one_time_method=False):
 
     elif role_id == 1:  # клавиатура начального входа без роли
         keyboard.add_button('/начальные классы', color=VkKeyboardColor.POSITIVE)
-        keyboard.add_line()  # Переход на новую строку
         keyboard.add_button('/старшие классы', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_line()  # Переход на новую строку
+        keyboard.add_button('/help', color=VkKeyboardColor.PRIMARY)
         result = keyboard.get_keyboard()
 
     elif role_id == 2:  # клавиатура выбора потока среди классов
