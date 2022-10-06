@@ -16,9 +16,6 @@ class Group:
         self.vk = vk_api.VkApi(token=self.__token)
         # используем .vk_api() для вызова API
         self.vk_api = self.vk.get_api()
-        # self.id_chat = ''
-        self.getConversation_Mem = self.vk_api.messages.getConversationMembers
-        self.getChatList = self.vk_api.messages.getConversations
         self.list_ids = []
 
     def get_chats_ids(self):
@@ -26,8 +23,9 @@ class Group:
         Получаем ID чатов группы
         :return: список ID чатов
         """
-        list_items = self.getChatList()
+        list_items = self.vk_api.messages.getConversations()
         list_ids = []
+        print('list-items= ', list_items)
         for a in range(len(list_items['items'])):
             if list_items['items'][a]['conversation']['peer']['type'] == 'chat':
                 list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
@@ -38,7 +36,7 @@ class Group:
         Получаем список чатов группы
         :return: список чатов
         """
-        list_items = self.getChatList()
+        list_items = self.vk_api.messages.getConversations()
         list_ids = []
         group_chat = []
         chat_data = []
