@@ -96,7 +96,7 @@ class DataBase:
         :param user_id: идентификатор пользователя в ВК
         :return: возвращает данные по юзеру
         """
-        sql = f"SELECT user_id_vk, role_id, invitation_sent, time_unanswered_msg " \
+        sql = f"SELECT user_id_vk, role_id, invitation_sent, command_executable, time_completion " \
               f"FROM users WHERE user_id_vk={user_id};"
         self.__cursor.execute(sql)
         result = self.__cursor.fetchone()  # получение единичной записи
@@ -133,9 +133,12 @@ class DataBase:
         :param user_id_db: int ID пользователя в БД
         :return: bool Статус отправки приглашения
         """
-        sql = f"SELECT invitation_sent FROM public.users WHERE id={user_id_db};"
+        result = False
+        sql = f"SELECT invitation_sent FROM users WHERE id={user_id_db};"
         self.__cursor.execute(sql)
-        result = self.__cursor.fetchone()[0]  # получение единичной записи
+        response = self.__cursor.fetchone()  # получение единичной записи
+        if response:
+            result = response[0]
         return result
 
     def update_invitation_msg_user(self, user_id_db):
@@ -320,9 +323,9 @@ class DataBase:
         """
         Получение данных по пользователю из таблицы users
         :param id_user_vk: ID пользователя ВК
-        :return: list(role_id, invitation_sent, time_unanswered_msg)
+        :return: list(role_id, invitation_sent, command_executable, time_completion)
         """
-        sql = f"SELECT role_id, invitation_sent, time_unanswered_msg FROM users WHERE user_id_vk={id_user_vk};"
+        sql = f"SELECT id, role_id, invitation_sent, command_executable, time_completion FROM users WHERE user_id_vk={id_user_vk};"
         self.__cursor.execute(sql)
         result = self.__cursor.fetchone()
         return result
