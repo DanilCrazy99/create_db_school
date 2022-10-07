@@ -277,7 +277,8 @@ def db_not_main_tables(cursor):
         user_id_vk integer NOT NULL, \
         role_id integer DEFAULT 0, \
         invitation_sent boolean NOT NULL DEFAULT false, \
-        time_unanswered_msg integer\
+        command_executable text, \
+        time_completion integer\
         );"
                    )
 
