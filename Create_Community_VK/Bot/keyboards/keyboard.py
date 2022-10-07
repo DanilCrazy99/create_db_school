@@ -41,37 +41,39 @@ def example_keyboard():
     # )
 
 
-def generator_keyboard(role_id=100, one_time_method=False):
+def generator_keyboard(key_set=100, one_time_method=False):
     """
     Генератор клавиатуры согласно роли пользователя в группе.
 
-    :param role_id: Роль пользователя в группе.По умолчанию пустая клавиатура.
+    :param key_set: Номер набора клавиатуры.По умолчанию пустая клавиатура.
     :param one_time_method: Метод отправки клавиатуры Inline=True или стандартная=False
     :return: keyboard формат ответа json строка
     """
     result = {}
     keyboard = VkKeyboard(one_time=one_time_method)
 
-    if role_id == 0:  # клавиатура не участника группы
+    if key_set == 0:  # клавиатура не участника группы
         keyboard.add_button('/Вступить в группу', color=VkKeyboardColor.POSITIVE)
         result = keyboard.get_keyboard()
 
-    elif role_id == 1:  # клавиатура начального входа без роли
+    elif key_set == 1:  # клавиатура начального входа без роли
         keyboard.add_button('/начальные классы', color=VkKeyboardColor.POSITIVE)
         keyboard.add_button('/старшие классы', color=VkKeyboardColor.POSITIVE)
         keyboard.add_line()  # Переход на новую строку
         keyboard.add_button('/help', color=VkKeyboardColor.PRIMARY)
         result = keyboard.get_keyboard()
 
-    elif role_id == 2:  # клавиатура выбора потока среди классов
+    elif key_set == 2 or key_set == 21:  # клавиатура выбора потока среди классов
         # если это начальная школа, то одна строка с 4-мя клавами
         # если средняя, то две
         # генерировать клавы только для существующих потоков
-        primary_school = True
+        primary_school = False
+        if key_set == 2:
+            primary_school = True
         list_flow = gr.grouping_chats_level(primary_school=primary_school)
         count_flow = len(list_flow)
         if count_flow != 0:
-            if count_flow > 4:
+            if count_flow < 4:
                 step = 0
                 for flow in list_flow:
                     step += 1
@@ -80,10 +82,14 @@ def generator_keyboard(role_id=100, one_time_method=False):
                         keyboard.add_line()  # Переход на новую строку
                     caption_key = '/' + flow
                     keyboard.add_button(caption_key, color=VkKeyboardColor.POSITIVE)
+                if step >= 4:
+                    keyboard.add_line()  # Переход на новую строку
+
+        keyboard.add_button('/назад', color=VkKeyboardColor.PRIMARY)
 
         result = keyboard.get_keyboard()
 
-    elif role_id == 3:  # клавиатура внутри потока и ссылками на чаты
+    elif key_set == 3:  # клавиатура внутри потока и ссылками на чаты
         list_litter_class = gr.litter_level_chat(2)  # передать номер потока в int
         step = 0
         if list_litter_class:
@@ -100,7 +106,7 @@ def generator_keyboard(role_id=100, one_time_method=False):
             result = keyboard.get_empty_keyboard()  # пустая клавиатура
             # необходимо вернуться на уровень выше по клавиатуре
 
-    elif role_id == 4:  # клавиатура выбора дня недели расписания
+    elif key_set == 4:  # клавиатура выбора дня недели расписания
         keyboard.add_button('/пн', color=color_key())
         keyboard.add_button('/вт', color=color_key())
         keyboard.add_button('/ср', color=color_key())
@@ -120,15 +126,15 @@ def generator_keyboard(role_id=100, one_time_method=False):
 
         result = keyboard.get_keyboard()
 
-    elif role_id == 5:  # клавиатура управления участием в чатах
+    elif key_set == 5:  # клавиатура управления участием в чатах
         keyboard.add_button('/вступить в чат', color=VkKeyboardColor.POSITIVE)
         keyboard.add_line()  # Переход на новую строку
         keyboard.add_button('/help', color=VkKeyboardColor.NEGATIVE)
-        keyboard.add_button('/покинуть чат', color=VkKeyboardColor.NEGATIVE)
+        keyboard.add_button('/я в чатах', color=VkKeyboardColor.NEGATIVE)
 
         result = keyboard.get_keyboard()
 
-    elif role_id == 6:  # клавиатура завуча
+    elif key_set == 6:  # клавиатура завуча
         keyboard.add_button('/загрузить расписание', color=VkKeyboardColor.POSITIVE)
         keyboard.add_button('/активировать расписание', color=VkKeyboardColor.POSITIVE)
         keyboard.add_line()  # Переход на новую строку
@@ -136,9 +142,20 @@ def generator_keyboard(role_id=100, one_time_method=False):
         keyboard.add_button('/удалить загрузку', color=VkKeyboardColor.NEGATIVE)
         result = keyboard.get_keyboard()
 
-    elif role_id == 10:  # клавиатура с кнопкой назад
+    elif key_set == 7:  # клавиатура с литерами потока
+        count_key = 0
+        # получить какой поток запрошен
+        # получить какие буквы в этом потоке доступны
+        designation_class = 'A'
+        caption_key = '/' + designation_class
+        keyboard.add_button(caption_key, color=VkKeyboardColor.POSITIVE)
+
+    elif key_set == 10:  # клавиатура с кнопкой назад
         keyboard.add_button('/назад', color=VkKeyboardColor.POSITIVE)
         result = keyboard.get_keyboard()
+
+    elif key_set == 100:  # очистка от всех клавиатур
+        result = keyboard.get_empty_keyboard()
 
     else:  # очистка от всех клавиатур
         result = keyboard.get_empty_keyboard()
