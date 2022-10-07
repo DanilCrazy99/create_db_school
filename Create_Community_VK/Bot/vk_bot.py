@@ -164,7 +164,7 @@ class VkBot:
             msg = help_user_no_chat
 
         # отправить клавиатуру с кнопкой "назад"
-        self.send_msg('Справка по работе с меню:'+msg, keyboard=gen_key(role_id=10))
+        self.send_msg('Справка по работе с меню:'+msg, keyboard=gen_key(key_set=10))
 
     def start(self):
         """
@@ -175,6 +175,24 @@ class VkBot:
         try:
             for event in self.long_poll.listen():
                 # print('входное сообщение: ', event)
+
+                # отработка вступления пользователя в группу
+                if event.type == VkBotEventType.GROUP_JOIN:
+                    # установить флаг отправки приглашения вступления в группу в True
+                    user_id_db = self.community.create_user(user_id=self.from_id)
+                    self.db.update_invitation_msg_user(user_id_db=user_id_db)
+
+                    # кто отправил сообщение
+                    self.from_id = event.obj['user_id']
+                    self.send_msg(message='Добро пожаловать в нашу группу.', keyboard=gen_key(key_set=1))
+
+                # отработка выхода пользователя из группы
+                if event.type == VkBotEventType.GROUP_LEAVE:
+                    # кто отправил сообщение
+                    self.from_id = event.obj['user_id']
+                    self.send_msg(message='Очень жаль что вы прощаетесь с нами.\n'
+                                          'Мы уже скучаем без вас.', keyboard=gen_key())
+
                 # обработка поступившего личного сообщения
                 if event.type == VkBotEventType.MESSAGE_NEW:
                     self.new_msg = self.correct_msg(event.obj['message']['text'])
@@ -191,6 +209,19 @@ class VkBot:
                         self.msg_help(user_id=self.from_id)
                         continue
 
+                    # отработка команды /начальные классы
+                    if self.new_msg == '/начальные классы':
+                        self.send_msg(message='Начальные классы.'
+                                      , keyboard=gen_key(key_set=2))
+                        continue
+
+                    # отработка команды /старшие классы
+                    if self.new_msg == '/старшие классы':
+                        # формируем клавиатуру параллелей
+                        self.send_msg(message='Старшие классы.'
+                                      , keyboard=gen_key(key_set=21))
+                        continue
+
                     # проверка на участие в группе
                     if not self.group.member_group(id_user=self.from_id):
                         # Сохраняем в БД данные по пользователю.
@@ -202,13 +233,13 @@ class VkBot:
                                   '\nЗарегистрируйтесь в чате своего класса.'
                             # обновляем статус отправки сообщения на True
                             self.db.update_invitation_msg_user(user_id_db=user_id_db)
-                            self.send_msg(message=msg, keyboard=gen_key(0))
+                            self.send_msg(message=msg)
                         continue  # Прерываем т.к. не член группы
 
                     # Проверить на участие в чатах. Если не участник. Передать клавиатуру выбора действий.
                     if not self.community.check_is_member_chat(user_id=self.from_id):
                         self.send_msg(message='Выберите действие.'
-                                      , keyboard=gen_key(1))
+                                      , keyboard=gen_key(key_set=1))
                         # обновляем в БД роль на user
                         continue  # прерываем т.к. не член чата
 
@@ -226,13 +257,13 @@ class VkBot:
                         # отработка команды "важные контакты"
                         if self.new_msg == '/важные контакты':
                             self.send_msg(message=hot_contact
-                                          , keyboard=gen_key(role_id=4))
+                                          , keyboard=gen_key(key_set=4))
                             continue
 
                         # отработка команды "назад"
                         if self.new_msg == '/важные контакты':
                             self.send_msg(message=hot_contact
-                                          , keyboard=gen_key(role_id=4))
+                                          , keyboard=gen_key(key_set=4))
                             continue
 
                         self.community.get_xl_file_from_msg()  # проверка на право загрузки файла расписания
@@ -245,7 +276,7 @@ class VkBot:
 
                         if self.new_msg == 'расписание на ...':
                             self.send_msg('за какой день хотите узнать'
-                                          ' расписание?', keyboard=gen_key(role_id=1))
+                                          ' расписание?', keyboard=gen_key(key_set=1))
 
                         elif self.new_msg in list_week_day:  # обработка по расписанию
                             list_chat_title = self.community.title_chat(user_id=self.from_id)
