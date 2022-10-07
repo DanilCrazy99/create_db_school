@@ -23,7 +23,6 @@ class Group:
         """
         list_items = self.vk_api.messages.getConversations()
         list_ids = []
-        print('list-items= ', list_items)
         for a in range(len(list_items['items'])):
             if list_items['items'][a]['conversation']['peer']['type'] == 'chat':
                 list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
