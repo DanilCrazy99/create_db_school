@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import vk_api
-import requests
-from Create_Community_VK.Config.Var_community import token_group, group_id
-from collections import namedtuple
+from Create_Community_VK.Config.Var_community import token_group, group_id, LEVEL_PRIMARY
 from operator import itemgetter, attrgetter, methodcaller
 
 
@@ -34,6 +32,7 @@ class Group:
     def get_chats(self):
         """
         Получаем список чатов группы
+
         :return: список чатов
         """
         list_items = self.vk_api.messages.getConversations()
@@ -62,9 +61,9 @@ class Group:
     def grouping_chats_level(self, primary_school=False):
         """
         Группировка чатов в списки по критерию начальная/средняя школа
+
         :return: словарь поток классов
         """
-        LEVEL_PRIMARY = 4
         chat = self.get_chats()
         # сортируем список по 2-му ключу вложенного списка
         sort_chat = sorted(chat, key=itemgetter(2))
@@ -87,6 +86,7 @@ class Group:
     def litter_level_chat(self, level):
         """
         Получаем список по срезу потока
+
         :param level: int номер потока
         :return: список
         """
@@ -109,6 +109,7 @@ class Group:
     def member_group(self, id_user):
         """
         Проверка на участие в нашей группе
+
         :return: True / False
         """
         if group_id != id_user and group_id != (-1 * id_user):
@@ -123,10 +124,11 @@ class Group:
 
     def admins_group(self):
         """
-        Достает список админов группы
+        Достает список администраторов группы
+
         :return: list
         """
         result = self.vk.method("groups.getMembers", {'group_id': group_id,
                                                       'filter': 'managers'})
-        # достаем список админов группы
+        # достаем список администраторов группы
         return result['items']
