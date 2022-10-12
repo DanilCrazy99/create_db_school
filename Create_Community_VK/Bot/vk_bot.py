@@ -8,13 +8,13 @@ import logging
 import traceback
 
 from datetime import datetime, timedelta
-from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType  # VkBotLongPoll работа от имени группы
 from Create_Community_VK.Config.token import token_group
 from Create_Community_VK.Config.Var_community import group_id
 from Create_Community_VK.Bot.db.database import DataBase
 from Create_Community_VK.Bot.Users.user import Community
 from Create_Community_VK.Bot.Group.group import Group
-from Create_Community_VK.Config.control_word import list_week_day, control_word, list_week_words, list_month_words
+from Create_Community_VK.Config.control_word import *
 from Create_Community_VK.Config.msg_default import hot_contact, help_user_chat_member, help_user_no_chat
 from Create_Community_VK.Bot.keyboards.keyboard import generator_keyboard as gen_key
 
@@ -76,6 +76,7 @@ class VkBot:
                       'random_id': 0}  # личное сообщение
         parameters.update({'user_id': self.from_id})
         self.vk.method('messages.send', parameters)
+        logging.info(f'Отправлено сообщение пользователю {self.from_id}')
 
     def correct_msg(self, msg):
         """
@@ -174,31 +175,31 @@ class VkBot:
 
         try:
             for event in self.long_poll.listen():
-                # print('входное сообщение: ', event)
+                print('входное сообщение: ', event)
+                # кто отправил сообщение
+                if 'user_id' in event.obj:
+                    self.from_id = event.obj['user_id']
+                elif 'from_id' in event.obj:
+                    self.from_id = event.obj['from_id']
 
                 # отработка вступления пользователя в группу
                 if event.type == VkBotEventType.GROUP_JOIN:
                     # установить флаг отправки приглашения вступления в группу в True
                     user_id_db = self.community.create_user(user_id=self.from_id)
-                    self.db.update_invitation_msg_user(user_id_db=user_id_db)
+                    self.db.update_invitation_msg_user(user_id_vk=self.from_id)
 
-                    # кто отправил сообщение
-                    self.from_id = event.obj['user_id']
                     self.send_msg(message='Добро пожаловать в нашу группу.', keyboard=gen_key(key_set=1))
 
                 # отработка выхода пользователя из группы
                 if event.type == VkBotEventType.GROUP_LEAVE:
-                    # кто отправил сообщение
-                    self.from_id = event.obj['user_id']
                     self.send_msg(message='Очень жаль что вы прощаетесь с нами.\n'
                                           'Мы уже скучаем без вас.', keyboard=gen_key())
+                    # сбрасываем флаг приглашения в False
+                    self.db.update_invitation_msg_user(user_id_vk=self.from_id, invitation=False)
 
                 # обработка поступившего личного сообщения
                 if event.type == VkBotEventType.MESSAGE_NEW:
-                    self.new_msg = self.correct_msg(event.obj['message']['text'])
-
-                    # кто отправил сообщение
-                    self.from_id = event.obj['message']['from_id']
+                    self.new_msg = self.correct_msg(event.obj['text'])
 
                     if self.from_id < 0:
                         # прерываем если пришло сообщение от группы
@@ -222,17 +223,26 @@ class VkBot:
                                       , keyboard=gen_key(key_set=21))
                         continue
 
+                    # отработка команды выбор потока класса
+                    if self.new_msg in list_class:
+                        flow_class = int(self.new_msg[1:])
+                        print('flow_class= ', flow_class)
+                        # формируем клавиатуру ссылок внутри параллели
+                        self.send_msg(message='Выберите свой класс.'
+                                      , keyboard=gen_key(key_set=3, flow_class=flow_class))
+                        continue
+
                     # проверка на участие в группе
                     if not self.group.member_group(id_user=self.from_id):
                         # Сохраняем в БД данные по пользователю.
                         user_id_db = self.community.create_user(user_id=self.from_id)
 
                         # проверяем флаг отправки приглашения вступить в группу
-                        if not self.db.select_invitation_msg_user(user_id_db=user_id_db):
+                        if not self.db.select_invitation_msg_user(user_id_vk=self.from_id):
                             msg = 'Пожалуйста вступите в нашу группу.' \
                                   '\nЗарегистрируйтесь в чате своего класса.'
                             # обновляем статус отправки сообщения на True
-                            self.db.update_invitation_msg_user(user_id_db=user_id_db)
+                            self.db.update_invitation_msg_user(user_id_vk=self.from_id)
                             self.send_msg(message=msg)
                         continue  # Прерываем т.к. не член группы
 
@@ -244,8 +254,8 @@ class VkBot:
                         continue  # прерываем т.к. не член чата
 
                     # обработка присоединённого файла
-                    if len(event.obj['message']['attachments']) != 0:
-                        ext_file = event.obj['message']['attachments'][0]['doc']['ext']
+                    if len(event.obj['attachments']) != 0:
+                        ext_file = event.obj['attachments'][0]['doc']['ext']
                         if ext_file == 'xlsx':
                             print('поступил xlsx файл')
                             logging.info('поступил xlsx файл')
@@ -266,7 +276,7 @@ class VkBot:
                                           , keyboard=gen_key(key_set=4))
                             continue
 
-                        self.community.get_xl_file_from_msg()  # проверка на право загрузки файла расписания
+                        # self.community.get_xl_file_from_msg()  # проверка на право загрузки файла расписания
 
                         # Проверяем пользователя на участие в чатах.
                         # Если он не имеет роли в ВК и не участник чата, то заносим его в БД cтатус visitor

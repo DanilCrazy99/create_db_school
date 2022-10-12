@@ -34,11 +34,10 @@ class Group:
 
         :return: список чатов
         """
-        list_items = self.vk_api.messages.getConversations()
-        list_ids = []
+        list_items = self.vk_api.messages.getConversations(count=200, group_id=group_id)
         group_chat = []
-        chat_data = []
-        for a in range(len(list_items['items'])):
+        count_chat = len(list_items['items'])
+        for a in range(count_chat):
             if list_items['items'][a]['conversation']['peer']['type'] == 'chat':
                 title_chat = list_items['items'][a]['conversation']['chat_settings']['title']
 
@@ -65,6 +64,7 @@ class Group:
         """
         chat = self.get_chats()
         # сортируем список по 2-му ключу вложенного списка
+        print('chat= ', chat)
         sort_chat = sorted(chat, key=itemgetter(2))
         class_level = []
         level_p = 0

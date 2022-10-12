@@ -127,27 +127,28 @@ class DataBase:
             id_user_db = self.select_user_data(id_user_vk=user_id)
             return id_user_db[0]
 
-    def select_invitation_msg_user(self, user_id_db):
+    def select_invitation_msg_user(self, user_id_vk):
         """
         Получение статуса контроля отправки приглашения вступления в группу
-        :param user_id_db: int ID пользователя в БД
+        :param user_id_vk: int ID пользователя в БД
         :return: bool Статус отправки приглашения
         """
         result = False
-        sql = f"SELECT invitation_sent FROM users WHERE id={user_id_db};"
+        sql = f"SELECT invitation_sent FROM users WHERE user_id_vk={user_id_vk};"
         self.__cursor.execute(sql)
         response = self.__cursor.fetchone()  # получение единичной записи
         if response:
             result = response[0]
         return result
 
-    def update_invitation_msg_user(self, user_id_db):
+    def update_invitation_msg_user(self, user_id_vk, invitation=True):
         """
         Меняем статус отправки приглашения вступления в группу на TRUE
 
-        :param user_id_db: int ID пользователя в БД
+        :param user_id_vk: int ID пользователя в ВК
+        :param invitation: статус отправки приглашения пользователю
         """
-        sql = f"UPDATE users SET invitation_sent=True WHERE id={user_id_db};"
+        sql = f"UPDATE users SET invitation_sent={invitation} WHERE user_id_vk={user_id_vk};"
         self.__cursor.execute(sql)
         self.__connect.commit()
 

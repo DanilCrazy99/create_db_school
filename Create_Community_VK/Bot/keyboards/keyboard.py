@@ -41,12 +41,13 @@ def example_keyboard():
     # )
 
 
-def generator_keyboard(key_set=100, one_time_method=False):
+def generator_keyboard(key_set=100, one_time_method=False, flow_class=0):
     """
     Генератор клавиатуры согласно роли пользователя в группе.
 
     :param key_set: Номер набора клавиатуры.По умолчанию пустая клавиатура.
     :param one_time_method: Метод отправки клавиатуры Inline=True или стандартная=False
+    :param flow_class: номер потока класса
     :return: keyboard формат ответа json строка
     """
     result = {}
@@ -71,40 +72,42 @@ def generator_keyboard(key_set=100, one_time_method=False):
         if key_set == 2:
             primary_school = True
         list_flow = gr.grouping_chats_level(primary_school=primary_school)
+        list_flow_sort = sorted(list_flow)
+        print('list_flow= ', list_flow_sort)
         count_flow = len(list_flow)
         if count_flow != 0:
-            if count_flow < 4:
-                step = 0
-                for flow in list_flow:
-                    step += 1
-                    if step == 4:
-                        step = 0
-                        keyboard.add_line()  # Переход на новую строку
-                    caption_key = '/' + flow
-                    keyboard.add_button(caption_key, color=VkKeyboardColor.POSITIVE)
-                if step >= 4:
+            step = 0
+            for flow in list_flow:
+                step += 1
+                if step > 4:
+                    step = 0
                     keyboard.add_line()  # Переход на новую строку
+                caption_key = '/' + flow
+                keyboard.add_button(caption_key, color=VkKeyboardColor.POSITIVE)
+        if step >= 4:
+            keyboard.add_line()  # Переход на новую строку
 
         keyboard.add_button('/назад', color=VkKeyboardColor.PRIMARY)
 
         result = keyboard.get_keyboard()
 
-    elif key_set == 3:  # клавиатура внутри потока и ссылками на чаты
-        list_litter_class = gr.litter_level_chat(2)  # передать номер потока в int
+    elif key_set == 3 and flow_class > 0:  # клавиатура внутри потока и ссылками на чаты
+        list_litter_class = gr.litter_level_chat(flow_class)  # передать номер потока в int
         step = 0
         if list_litter_class:
             for item in list_litter_class:
-                step += 1
-                if step == 2:  # максимальное число кнопок в ряду
+                if step >= 2:  # максимальное число кнопок в ряду
                     step = 0
                     keyboard.add_line()  # Переход на новую строку
-                caption_key = '/ чат "' + item[2] + '" класса '
-                link_chat = gr.get_link_chats(item[3])
+                caption_key = '/чат `' + item[2] + '` класса '
+                link_chat = item[4]
                 keyboard.add_openlink_button(label=caption_key, link=link_chat)
-            result = keyboard.get_keyboard()
-        else:
-            result = keyboard.get_empty_keyboard()  # пустая клавиатура
-            # необходимо вернуться на уровень выше по клавиатуре
+                step += 1
+
+        keyboard.add_line()  # Переход на новую строку
+        keyboard.add_button('/назад', color=VkKeyboardColor.PRIMARY)
+
+        result = keyboard.get_keyboard()
 
     elif key_set == 4:  # клавиатура выбора дня недели расписания
         keyboard.add_button('/пн', color=color_key())
@@ -121,16 +124,17 @@ def generator_keyboard(key_set=100, one_time_method=False):
 
         keyboard.add_line()  # Переход на новую строку
 
-        keyboard.add_button('/меню выше')
+        keyboard.add_button('/меню чатов')
         keyboard.add_button('/важные контакты')
 
         result = keyboard.get_keyboard()
 
     elif key_set == 5:  # клавиатура управления участием в чатах
         keyboard.add_button('/вступить в чат', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('/я в чатах', color=VkKeyboardColor.POSITIVE)
         keyboard.add_line()  # Переход на новую строку
         keyboard.add_button('/help', color=VkKeyboardColor.NEGATIVE)
-        keyboard.add_button('/я в чатах', color=VkKeyboardColor.NEGATIVE)
+        keyboard.add_button('/назад', color=VkKeyboardColor.PRIMARY)
 
         result = keyboard.get_keyboard()
 
