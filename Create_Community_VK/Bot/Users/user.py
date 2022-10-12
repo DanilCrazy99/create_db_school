@@ -56,6 +56,10 @@ class Community:
             if item['id'] == user_id:
                 role = item['role']
                 return role
+        # проверить на участие в группе.
+        if self.group.member_group(id_user=user_id):
+            return 'user'
+        # если не участник
         return 'visitor'
 
     def create_user(self, user_id):
