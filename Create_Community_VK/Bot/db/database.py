@@ -78,6 +78,17 @@ class DataBase:
         self.__connect.commit()
         logging.info(f'Добавлен новый статус {status_name}')
 
+    def update_status_user(self, id_user_vk, number_status):
+        """
+        Обновление статуса юзера в таблице сервера состояний
+        :param id_user_vk: ID пользователя в ВК
+        :param number_status: Номер текущего статуса пользователя.
+        """
+        sql = "UPDATE status_server SET id_status=%s WHERE id_user_vk=%s;"
+        params = (number_status, id_user_vk)
+        self.__cursor.execute(sql, params)
+        self.__connect.commit()
+
     def select_status(self, key_stat):
         """
         Получаем ID статуса по ключу статуса в таблице статусов
