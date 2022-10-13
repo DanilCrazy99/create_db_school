@@ -100,6 +100,31 @@ class DataBase:
         result = self.__cursor.fetchone()  # получение единичной записи
         return result
 
+    def select_user_status_server(self, id_user_vk):
+        """
+        Получение текущего состояния юзера в сервере статуса
+        :param id_user_vk: идентификатор пользователя в ВК
+        :return: возвращает описание статуса и id статуса
+        """
+        sql = "SELECT status_server.id_status, status.status_member " \
+              "FROM status_server INNER JOIN status ON status_server.id_status=status.id " \
+              f"WHERE status_server.id_user_vk={id_user_vk};"
+        self.__cursor.execute(sql)
+        result = self.__cursor.fetchone()  # получение единичной записи
+        return result
+
+    def insert_user_status_server(self, user_id_vk, status_id):
+        """
+        Добавление записи в БД по юзеру с указанием его текущего статуса
+        :param user_id_vk: идентификатор пользователя в ВК
+        :param status_id: ID статуса состояний юзера
+        """
+        sql = "INSERT INTO status_server(id_user_vk, id_status) VALUES (%s, %s);"
+        parameter = (user_id_vk, status_id)
+        self.__cursor.execute(sql, parameter)
+        self.__connect.commit()
+        logging.info(f'Изменен статус пользователя {user_id_vk} на {status_id}')
+
     def select_user(self, user_id):
         """
         Получение текущего данных юзера.
@@ -213,30 +238,6 @@ class DataBase:
             logging.info(f'Добавлена новая роль {role_name}')
         return result
 
-    def select_user_status_server(self, user_id):
-        """
-        Получение текущего состояния юзера в сервере статуса
-        :param user_id: идентификатор пользователя в ВК
-        :return: возвращает описание статуса и id статуса
-        """
-        sql = "SELECT status_server.id_status, status.status_member " \
-              "FROM status_server INNER JOIN status ON status_server.id_status=status.id " \
-              f"WHERE status_server.id_user_vk={user_id};"
-        self.__cursor.execute(sql)
-        result = self.__cursor.fetchone()  # получение единичной записи
-        return result
-
-    def update_status_server(self, user_id, status_id):
-        """
-        Обновление статуса пользователя в таблице status_server
-        :param user_id: ID пользователя в ВК
-        :param status_id: ID устанавливаемого статуса из таблицы status
-        """
-        sql = "UPDATE status_server SET id_status=%s WHERE id_user_vk=%s;"
-        parameter = (status_id, user_id)
-        self.__cursor.execute(sql, parameter)
-        self.__connect.commit()
-
     def select_key_stats_1(self, status_id):
         """
         Получаем INT значение статуса по его ID
@@ -247,18 +248,6 @@ class DataBase:
         self.__cursor.execute(sql)
         result = self.__cursor.fetchone()  # получение единичной записи
         return result
-
-    def insert_user_status_server(self, user_id_vk, status_id):
-        """
-        Добавление записи в БД по юзеру с указанием его текущего статуса
-        :param user_id_vk: идентификатор пользователя в ВК
-        :param status_id: ID статуса состояний юзера
-        """
-        sql = "INSERT INTO status_server(id_user_vk, id_status) VALUES (%s, %s);"
-        parameter = (user_id_vk, status_id)
-        self.__cursor.execute(sql, parameter)
-        self.__connect.commit()
-        logging.info(f'Изменен статус пользователя {user_id_vk} на {status_id}')
 
     # удаление описателя статуса
     def delete_status(self, status_name):
