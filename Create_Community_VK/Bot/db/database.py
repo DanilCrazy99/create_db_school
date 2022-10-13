@@ -106,7 +106,7 @@ class DataBase:
         :param id_user_vk: идентификатор пользователя в ВК
         :return: возвращает описание статуса и id статуса
         """
-        sql = "SELECT status_server.id_status, status.status_member " \
+        sql = "SELECT status_server.id_status, status.status_member, status.key_stats_1 " \
               "FROM status_server INNER JOIN status ON status_server.id_status=status.id " \
               f"WHERE status_server.id_user_vk={id_user_vk};"
         self.__cursor.execute(sql)
@@ -119,11 +119,12 @@ class DataBase:
         :param user_id_vk: идентификатор пользователя в ВК
         :param status_id: ID статуса состояний юзера
         """
-        sql = "INSERT INTO status_server(id_user_vk, id_status) VALUES (%s, %s);"
-        parameter = (user_id_vk, status_id)
-        self.__cursor.execute(sql, parameter)
-        self.__connect.commit()
-        logging.info(f'Изменен статус пользователя {user_id_vk} на {status_id}')
+        if not self.select_user_status_server(id_user_vk=user_id_vk):
+            sql = "INSERT INTO status_server(id_user_vk, id_status) VALUES (%s, %s);"
+            parameter = (user_id_vk, status_id)
+            self.__cursor.execute(sql, parameter)
+            self.__connect.commit()
+            logging.info(f'Добавлен пользователь в таб status_server {user_id_vk} на {status_id}')
 
     def select_user(self, user_id):
         """
