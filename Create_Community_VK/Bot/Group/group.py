@@ -64,7 +64,6 @@ class Group:
         """
         chat = self.get_chats()
         # сортируем список по 2-му ключу вложенного списка
-        print('chat= ', chat)
         sort_chat = sorted(chat, key=itemgetter(2))
         class_level = []
         level_p = 0
