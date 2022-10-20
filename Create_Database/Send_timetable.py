@@ -1,8 +1,9 @@
-from datetime import datetime
 
 import psycopg2
 import Create_timetable
-from Create_Database.Config.Var_database import schoolName, user, password, host, port, path_timetable
+
+from datetime import datetime
+from Create_Database.Config.Var_database import schoolName, user, password, host, port
 
 
 def send_timetable(editor_id_vk='740705763'):
@@ -20,7 +21,7 @@ def send_timetable(editor_id_vk='740705763'):
             host=host,
             port=port
             )
-        completed_list, date_time = Create_timetable.create_timetable_list(path_timetable)
+        completed_list, date_time = Create_timetable.create_timetable_list()
         completed_list = Create_timetable.create_postgres_list(completed_list)
         send_trigger = False
         for a in range(len(completed_list)):
