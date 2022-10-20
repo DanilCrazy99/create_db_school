@@ -32,7 +32,9 @@ class DataBase:
         return sql, tuple(parameters.values())
 
     def select_timetable_class(self, week_day=[], class_letter=[]):
-        # формируем условия запроса по дню недели
+        """
+        Получение выборки расписания по дню недели
+        """
         sql_week = ''
         sql_week += " OR ".join([f"day_of_week ='{item}'" for item in week_day])
 
@@ -48,8 +50,10 @@ class DataBase:
         result = self.__cursor.fetchall()
         return result
 
-    # Проверка на наличие специфичной роли в postgres
     def select_roles_with_vk_id(self, id_user):
+        """
+        Проверка на наличие специфичной роли в postgres
+        """
         with self.__cursor() as cursor:
             cursor.execute(
                 "SELECT * FROM role INNER JOIN users ON role.id = users.role_id;"
@@ -95,7 +99,7 @@ class DataBase:
         :param key_stat: int
         :return: int
         """
-        sql = f"SELECT id FROM public.status WHERE key_stats_1 = {key_stat};"
+        sql = f"SELECT id FROM status WHERE key_stats_1 = {key_stat};"
         self.__cursor.execute(sql)
         result = self.__cursor.fetchone()  # получение единичной записи
         return result
@@ -103,6 +107,7 @@ class DataBase:
     def select_user_status_server(self, id_user_vk):
         """
         Получение текущего состояния юзера в сервере статуса
+
         :param id_user_vk: идентификатор пользователя в ВК
         :return: возвращает описание статуса и id статуса
         """
@@ -116,6 +121,7 @@ class DataBase:
     def insert_user_status_server(self, user_id_vk, status_id):
         """
         Добавление записи в БД по юзеру с указанием его текущего статуса
+
         :param user_id_vk: идентификатор пользователя в ВК
         :param status_id: ID статуса состояний юзера
         """
@@ -151,7 +157,7 @@ class DataBase:
         result = self.select_user(user_id=user_id)
         if not result:
             sql = "INSERT INTO users(user_id_vk, role_id, invitation_sent) VALUES (%s, %s, %s) RETURNING id;"
-            # параметр invitation_sent в этом случае ставим в True (отправлено)
+            # параметр invitation_sent ставим в False (не отправлено)
             invitation = False
             parameter = (user_id, role_id, invitation)
             self.__cursor.execute(sql, parameter)
@@ -166,7 +172,8 @@ class DataBase:
 
     def select_invitation_msg_user(self, user_id_vk):
         """
-        Получение статуса контроля отправки приглашения вступления в группу
+        Статуса контроля отправки приглашения вступления в группу
+
         :param user_id_vk: int ID пользователя в БД
         :return: bool Статус отправки приглашения
         """
@@ -270,7 +277,7 @@ class DataBase:
         result = []
         sql = "SELECT id, time_update, time_activate, editor_user_id, id_timetable " \
               "FROM timetable_time_activate " \
-              "WHERE time_activate <= CURRENT_DATE ORDER BY time_activate DESC;"
+              "WHERE time_activate <= LOCALTIMESTAMP ORDER BY time_activate DESC;"
         self.__cursor.execute(sql)
         response = self.__cursor.fetchone()
         start_id = response[4]  # получение начала в таблице time_table
@@ -303,9 +310,10 @@ class DataBase:
 
     def select_time_table_activate(self, class_letter='', week_day=''):
         """
-        получаем текущее активное расписание
-        :param class_letter: название запрашиваемого класса
-        :param week_day: день недели если пустой то вся неделя
+        Получаем текущее активное расписание
+
+        :param class_letter: название запрашиваемого класса.
+        :param week_day: день недели если пустой то вся неделя.
         :return: список активного расписания
         """
         id_table_borders = self.current_schedule()  # получаем границы активного расписания
