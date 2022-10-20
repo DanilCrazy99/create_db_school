@@ -34,15 +34,21 @@ class Community:
             list_members.append(list_items['items'][a]['member_id'])
         return list_members
 
-    def age_indicated(self, user_id):
+    def user_account_check(self, user_id_vk):
         """
-        Получить возраст пользователя
-        :param user_id: ID пользователя в ВК
-        :return:
+        Проверка учета юзера в базе данных.
+
+        :param user_id_vk:  int ID юзера в ВК
+        :return: str. role user
         """
-        info = self.vk_api.users.get(user_ids=user_id, fields='bdate')
-        print('info =', info)
-        pass
+        # обновляем роль юзера в БД по данным ВК
+        user_role = self.user_role_in_group(user_id=user_id_vk)
+        id_role = self.db.select_id_role(role=user_role)
+        self.db.insert_user(user_id=user_id_vk, role_id=id_role)
+        # если роль участника группы, то invitation_sent ставим в True
+        # if user_role != 'visitor':
+        #     self.db.update_invitation_msg_user(user_id_vk=user_id_vk)
+        return user_role
 
     def user_role_in_group(self, user_id):
         """
@@ -72,6 +78,8 @@ class Community:
 
         role_id = self.db.select_id_role(role=self.user_role_in_group(user_id=user_id))
         result = self.db.insert_user(user_id=user_id, role_id=role_id)
+        # Устанавливаем статус сервера состояния =1 (новый юзер. 1-й уровень)
+        self.db.insert_user_status_server(user_id_vk=user_id, status_id=1)
         return result
 
     def check_is_member_chat(self, user_id):
@@ -87,6 +95,14 @@ class Community:
             if user_id in list_members:
                 chat_list_this_id.append(self.list_ids[a])
         return chat_list_this_id
+
+    def control_access_command(self, user_id_vk):
+        """
+        Проверка разрешения юзеру доступка к переданной команде
+        :param user_id_vk:   ID пользователя в ВК
+        :return: bool
+        """
+        return True
 
     def title_chat(self, user_id):
         """
@@ -104,18 +120,17 @@ class Community:
         """
         Получение статуса юзера в таблице status_server
         :param id_user_vk: ID пользователя в ВК
-        :return: int номер статуса
+        :return: int ID статуса из таблицы status
         """
-        if not self.db.select_user_status_server(user_id=id_user_vk):
-            # если записи нет то создаем с id_status у которой key_status_1 = 1
+        if not self.db.select_user_status_server(id_user_vk=id_user_vk):
+            # если записи нет то создаем с id_status у которой key_stats_1 = 1
             id_status = self.db.select_status(1)
             # добавляем запись  в таблицу status_server
             self.db.insert_user_status_server(user_id_vk=id_user_vk, status_id=id_status)
-            return id_status
-        # если запись есть достаем по iD статуса значение key_stats_1
-        status_id = self.db.select_user_status_server(user_id=id_user_vk)[0]
-        result = self.db.select_key_stats_1(status_id=status_id)
-        return result
+        else:
+            # если запись есть достаем по iD статуса значение key_stats_1
+            id_status = self.db.select_user_status_server(id_user_vk=id_user_vk)[0]
+        return id_status
 
     def set_user_status_server(self, id_user_vk, id_status):
         """
@@ -124,9 +139,9 @@ class Community:
         :param id_status: ID статуса состояний по таблице status
         """
         # создать или обновить запись в сервере состояний
-        if self.db.select_user_status_server(user_id=id_user_vk):
+        if self.db.select_user_status_server(id_user_vk=id_user_vk):
             # обновляем запись
-            self.db.update_status_server(user_id=id_user_vk, status_id=id_status)
+            self.db.update_status_user(id_user_vk=id_user_vk, number_status=id_status)
         else:
             # создаём запись
             self.db.insert_user_status_server(user_id_vk=id_user_vk, status_id=id_status)
