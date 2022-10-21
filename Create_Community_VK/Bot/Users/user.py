@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import vk_api
 import requests
-from Create_Community_VK.Config.Var_community import token_group
+from Create_Community_VK.Config.Var_community import token_group, user_admin, path_timetableFile
 from Create_Community_VK.Bot.Group.group import Group
 from Create_Community_VK.Bot.db.database import DataBase
+from Create_Database.Send_timetable import send_timetable
 
 
 class Community:
@@ -16,8 +17,8 @@ class Community:
         # используем .vk_api() для вызова API
         self.vk_api = self.vk.get_api()
         # self.id_chat = ''
-        self.getConversation_Mem = self.vk_api.messages.getConversationMembers  #
-        self.getChatList = self.vk_api.messages.getConversations
+        # self.getConversation_Mem = self.vk_api.messages.getConversationMembers
+        # self.getChatList = self.vk_api.messages.getConversations
         self.list_ids = []
         self.db = DataBase()
         self.group = Group()
@@ -28,7 +29,8 @@ class Community:
         :param id_chat: ID чата
         :return: список участников
         """
-        list_items = self.getConversation_Mem(peer_id=id_chat)
+        # list_items = self.getConversation_Mem(peer_id=id_chat)
+        list_items = self.vk_api.messages.getConversationMembers(peer_id=id_chat)
         list_members = []
         for a in range(len(list_items['items'])):
             list_members.append(list_items['items'][a]['member_id'])
@@ -146,28 +148,32 @@ class Community:
             # создаём запись
             self.db.insert_user_status_server(user_id_vk=id_user_vk, status_id=id_status)
 
-    def get_xl_file_from_msg(self, id_editor=1640521):
+    def get_xl_file_from_msg(self, id_editor=user_admin):
         """
         Загрузка файла расписания
-        :param id_editor: ID загружающего пользователя
-        :return:
+        :param id_editor: ID ВК загружающего пользователя
         """
         info_msg_editor = {}
         url_value = ''
-        id_msg = self.getChatList()
+        # id_msg = self.getChatList()
+        id_msg = self.vk_api.messages.getConversations()
         if id_msg:
             for a in range(len(id_msg['items'])):
                 if id_msg['items'][a]['conversation']['peer']['id'] == id_editor:
                     info_msg_editor = id_msg['items'][a]
-            last_id_msg = info_msg_editor['conversation']['last_conversation_message_id']
-            get_info_about_msg = self.vk_api.messages.getByConversationMessageId
-            list_items = get_info_about_msg(peer_id=id_editor, conversation_message_ids=last_id_msg)
-            if len(list_items['items'][0]['attachments']) == 1:
-                attachment = list_items['items'][0]['attachments'][0]['doc']
-                if attachment['ext'] == 'xlsx':
-                    url_value = attachment['url']
-                if url_value:
-                    r = requests.get(url_value, allow_redirects=True)
-                    with open('timetable.xlsx', 'wb') as o:
-                        o.write(r.content)
+                    last_id_msg = info_msg_editor['conversation']['last_conversation_message_id']
+                    list_items = self.vk_api.messages.getByConversationMessageId(peer_id=id_editor,
+                                                                                 conversation_message_ids=last_id_msg)
+                    if len(list_items['items'][0]['attachments']) == 1:
+                        attachment = list_items['items'][0]['attachments'][0]['doc']
+                        if attachment['ext'] == 'xlsx':
+                            url_value = attachment['url']
+                        if url_value:
+                            r = requests.get(url_value, allow_redirects=True)
+                            with open("timetable.xlsx", 'wb') as o:
+                                o.write(r.content)
+                                print('файл сохранён в директории')
+                            o.close()
+                            # запускаем загрузку данных в БД
+                            send_timetable()
 
