@@ -89,9 +89,9 @@ def controller_keyboard(id_user_vk, role_user_vk, key_command=None):
                 for item_chat_title in list_chat_title:
                     cycle += 1
                     tmp_list_title.append(item_chat_title)
-                    week_letter, header_timetable = date_words(key_command)
+                    week_letter, header_timetable, selected_day = date_words(key_command)
                     result_msg += f'{header_timetable}\nкласс: {item_chat_title}' \
-                                  f'{daily_lesson_schedule(class_letter=tmp_list_title, week_day=week_letter)}'
+                                  f'{daily_lesson_schedule(class_letter=tmp_list_title, week_day=week_letter, selected_day=selected_day)}'
                     tmp_list_title.clear()
                     if len(list_chat_title) > cycle:
                         result_msg += '\n\n'
@@ -104,14 +104,15 @@ def controller_keyboard(id_user_vk, role_user_vk, key_command=None):
     return result_msg, result_keyboard
 
 
-def daily_lesson_schedule(class_letter=['5Б'], week_day=['Вторник']):
+def daily_lesson_schedule(class_letter=['5Б'], week_day=['Вторник'], selected_day=''):
     """
     Получение расписания на один день
     :param class_letter: list Название классов школы в str
     :param week_day: str день недели(вида "Вторник")
+    :param selected_day: str дата выбранного дня(вида "10/24/2022")
     :return:
     """
-    data_timetable = db.select_time_table_activate(class_letter=class_letter[0], week_day=week_day[0])
+    data_timetable = db.select_time_table_activate(class_letter=class_letter[0], week_day=week_day[0], selected_day=selected_day)
     str_table = ''
     circle = 0
     for data_week in data_timetable:
@@ -128,7 +129,7 @@ def date_words(input_week_day):
     """
     Формируем шапку расписания.
 
-    :param input_week_day: День недели (вида "вт")
+    :param input_week_day: День недели (вида "/вт")
     :return: день недели для SQL запроса (вида "Вторник")
     """
     today = datetime.today()
@@ -167,7 +168,8 @@ def date_words(input_week_day):
                        f'{tomorrow.strftime("%Y")}г'
 
     result_word.append(week_words[tomorrow_week_day].capitalize())
-    return result_word, header_timetable
+    selected_day = tomorrow.strftime("%Y-%m-%d")
+    return result_word, header_timetable, selected_day
 
 
 def generator_keyboard(set_keyboard, id_user_vk=0, one_time_method=False, flow_class=0):
