@@ -150,6 +150,16 @@ class VkBot:
                 if event.type == VkBotEventType.MESSAGE_NEW:
                     self.new_msg = self.correct_msg(event.obj['text'])
 
+                    # обработка присоединённого файла
+                    if len(event.obj['attachments']) != 0:
+                        ext_file = event.obj['attachments'][0]['doc']['ext']
+                        if ext_file == 'xlsx':
+                            print('поступил xlsx файл')
+                            logging.info('поступил xlsx файл')
+                            self.community.get_xl_file_from_msg()
+                            self.send_msg('Файл добавлен в таблицу учета расписаний.')
+                            continue
+
                     # проверка допустимости команды
                     if not (self.new_msg in control_word):
                         print('Прерывание выполнения.\nПоступила не распознанная команда')
@@ -161,14 +171,6 @@ class VkBot:
                                                       , role_user_vk=role_user_vk
                                                       , key_command=self.new_msg)
                     self.send_msg(message=answer_msg, keyboard=keyboard)
-
-                    # обработка присоединённого файла
-                    if len(event.obj['attachments']) != 0:
-                        ext_file = event.obj['attachments'][0]['doc']['ext']
-                        if ext_file == 'xlsx':
-                            print('поступил xlsx файл')
-                            logging.info('поступил xlsx файл')
-                            self.community.get_xl_file_from_msg()
 
         except requests.exceptions.ReadTimeout:
             error_msg = traceback.format_exc()
