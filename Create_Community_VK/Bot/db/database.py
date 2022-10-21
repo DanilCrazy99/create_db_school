@@ -269,15 +269,18 @@ class DataBase:
         self.__connect.commit()
         logging.info(f'Удаление статуса {status_name}')
 
-    def current_schedule(self):
+    def current_schedule(self, selected_day=''):
         """
         Получение начального и конечного ID таблицы timetable
+        :param selected_day: str дата выбранного дня(вида "10/24/2022")
         :return: начальный и конечный id. Если таблица пуста присвоить значения 0
         """
         result = []
+        # Запрос получения данных относительно текущего календарного дня
+        # с сортировкой заливки файла от последнего к первому.
         sql = "SELECT id, time_update, time_activate, editor_user_id, id_timetable " \
               "FROM timetable_time_activate " \
-              "WHERE time_activate <= LOCALTIMESTAMP ORDER BY time_activate DESC;"
+              f"WHERE time_activate <= '{selected_day}' ORDER BY time_activate DESC;"  # LOCALTIMESTAMP
         self.__cursor.execute(sql)
         response = self.__cursor.fetchone()
         start_id = response[4]  # получение начала в таблице time_table
@@ -308,15 +311,16 @@ class DataBase:
             result = stop_id[0]
         return result
 
-    def select_time_table_activate(self, class_letter='', week_day=''):
+    def select_time_table_activate(self, class_letter='', week_day='', selected_day=''):
         """
         Получаем текущее активное расписание
 
         :param class_letter: название запрашиваемого класса.
         :param week_day: день недели если пустой то вся неделя.
+        :param selected_day: tr дата выбранного дня(вида "10/24/2022")
         :return: список активного расписания
         """
-        id_table_borders = self.current_schedule()  # получаем границы активного расписания
+        id_table_borders = self.current_schedule(selected_day=selected_day)  # получаем границы активного расписания
         sql = "SELECT id, class, lesson_number, academic_discipline, day_of_week " \
               "FROM timetable " \
               f"WHERE id >= {id_table_borders[0]} AND id <= {id_table_borders[1]} "
