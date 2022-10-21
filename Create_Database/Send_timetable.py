@@ -1,12 +1,13 @@
 
 import psycopg2
-import Create_timetable
 
 from datetime import datetime
 from Create_Database.Config.Var_database import schoolName, user, password, host, port
+from Create_Community_VK.Config.Var_community import user_admin
+from Create_Database.Create_timetable import *
 
 
-def send_timetable(editor_id_vk='740705763'):
+def send_timetable(editor_id_vk=user_admin):
     """
     Загрузка таблицы расписания в БД
     :param editor_id_vk: id пользователя который прислал изменения(завуч, директор, админ)
@@ -21,8 +22,8 @@ def send_timetable(editor_id_vk='740705763'):
             host=host,
             port=port
             )
-        completed_list, date_time = Create_timetable.create_timetable_list()
-        completed_list = Create_timetable.create_postgres_list(completed_list)
+        completed_list, date_time = create_timetable_list()
+        completed_list = create_postgres_list(completed_list)
         send_trigger = False
         for a in range(len(completed_list)):
             without_brackets = str(completed_list[a])
@@ -40,7 +41,6 @@ def send_timetable(editor_id_vk='740705763'):
                                    )
                     id_first_timetable = str(cursor.fetchall())
                     id_first_timetable = id_first_timetable[2:-3]
-                    print(id_first_timetable)
                 else:
                     cursor.execute("INSERT INTO timetable (class, "
                                    "lesson_number, "
@@ -55,7 +55,7 @@ def send_timetable(editor_id_vk='740705763'):
                            "time_activate, "
                            "editor_user_id, "
                            "id_timetable) "
-                           f"VALUES ('{date_time}', '{editor_id_vk}', {id_first_timetable})"
+                           f"VALUES ('{date_time}', '{str(editor_id_vk)}', {id_first_timetable})"
                            )
             connection.commit()
     except Exception as _ex:
