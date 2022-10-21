@@ -2,7 +2,7 @@
 
 import openpyxl
 
-tmp_path = '../file/timetable.xlsx'
+tmp_path = 'timetable.xlsx'
 
 
 def create_timetable_list(path=tmp_path):
@@ -27,7 +27,7 @@ def create_timetable_list(path=tmp_path):
             # print(sheet[3][4].value)   E3    123456789
             # info_editor = sheet[2][1].value   Информация: Ответственный и дата
             lesson_cell_coordinate_number = 3
-            date_time = sheet[1][5].value
+            date_time = sheet[2][5].value
             for columns_name_class in range(3, sheet.max_column):  # Получаю список классов при помощи прохода по 3-й строке
                 if sheet[3][columns_name_class].value:
                     list_class.append(sheet[3][columns_name_class].value)
