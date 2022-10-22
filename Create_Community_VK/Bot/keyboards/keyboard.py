@@ -80,6 +80,10 @@ def controller_keyboard(id_user_vk, role_user_vk, key_command=None):
                 key_set = 4
                 user.set_user_status_server(id_user_vk=id_user_vk, id_status=db.select_status(key_stat=key_set))
                 result_msg = 'Выберите день, для запроса расписания.'
+            elif key_command == '/меню':
+                key_set = 1
+                user.set_user_status_server(id_user_vk=id_user_vk, id_status=db.select_status(key_stat=key_set))
+                result_msg = 'Основное меню.'
 
             elif key_command in list_week_day:  # обработка по расписанию
                 list_chat_title = user.title_chat(user_id=id_user_vk)
@@ -257,7 +261,7 @@ def generator_keyboard(set_keyboard, id_user_vk=0, one_time_method=False, flow_c
 
         keyboard.add_line()  # Переход на новую строку
 
-        keyboard.add_button('/меню чатов')
+        keyboard.add_button('/меню')
         keyboard.add_button('/важные контакты')
 
         result = keyboard.get_keyboard()
