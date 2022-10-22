@@ -30,7 +30,7 @@ class Community:
         :return: список участников
         """
         # list_items = self.getConversation_Mem(peer_id=id_chat)
-        list_items = self.vk_api.messages.getConversationMembers(peer_id=id_chat)
+        list_items = self.vk_api.messages.getConversationMembers(peer_id=id_chat, group_id=215601456)
         list_members = []
         for a in range(len(list_items['items'])):
             list_members.append(list_items['items'][a]['member_id'])
