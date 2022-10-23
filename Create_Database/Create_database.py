@@ -278,6 +278,7 @@ def db_not_main_tables(cursor):
         role_id integer DEFAULT 0, \
         invitation_sent boolean NOT NULL DEFAULT false, \
         command_executable text, \
+        latest_schedule_date timestamp without time zone, \
         time_completion integer\
         );"
                    )
