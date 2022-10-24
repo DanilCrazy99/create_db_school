@@ -20,8 +20,9 @@ def load_data():
             for item in list_data:
                 cursor.execute("INSERT INTO "
                                "status(status_member, key_stats_1) "
-                               f"VALUES ({item[0]}, {item[1]});")
+                               f"VALUES ('{item[0]}', {item[1]});")
                 connection.commit()
+        print('Загрузка завершена')
 
     except Exception as _ex:
         print("[INFO] Error while working with PostgreSQL", _ex)
