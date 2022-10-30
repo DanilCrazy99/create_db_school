@@ -1,5 +1,5 @@
 import psycopg2
-from Create_Database.Config.Var_database import main_database, user, password, host, port, schoolName, schoolPass
+from Config.Var_database import main_database, user, password, host, port, schoolName, schoolPass
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 
@@ -204,6 +204,7 @@ def db_main_tables(cursor):
         time_update timestamp without time zone DEFAULT CURRENT_TIMESTAMP, \
         time_activate timestamp without time zone, \
         editor_user_id integer, \
+        class_flow text NOT NULL, \
         id_timetable integer\
         );"
                    )
