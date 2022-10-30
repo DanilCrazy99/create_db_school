@@ -290,11 +290,11 @@ class DataBase:
         self.__connect.commit()
         logging.info(f'Удаление статуса {status_name}')
 
-    def current_schedule(self, selected_day='', class_flow=''):
+    def current_schedule(self, selected_day='', class_letter=''):
         """
         Получение начального и конечного ID таблицы timetable
         :param selected_day: дата выбранного дня(вида "10/24/2022")
-        :param class_flow: обозначение потока класса
+        :param class_letter: обозначение потока класса
         :return: начальный и конечный id. Если таблица пуста присвоить значения 0
         """
         result = []
@@ -302,7 +302,8 @@ class DataBase:
         # с сортировкой заливки файла от последнего к первому.
         sql = "SELECT id, time_update, time_activate, editor_user_id, id_timetable " \
               "FROM timetable_time_activate " \
-              f"WHERE time_activate <= '{selected_day}' ORDER BY time_activate DESC;"  # LOCALTIMESTAMP
+              f"WHERE time_activate <= '{selected_day}' AND class_flow = '{get_flow(class_letter)}' " \
+              f"ORDER BY time_activate DESC;"  # LOCALTIMESTAMP
         self.__cursor.execute(sql)
         response = self.__cursor.fetchone()
         start_id = response[4]  # получение начала в таблице time_table
@@ -343,7 +344,7 @@ class DataBase:
         :return: список активного расписания
         """
         # получаем границы активного расписания для конкретного класса
-        id_table_borders = self.current_schedule(selected_day=selected_day, class_flow=class_letter)
+        id_table_borders = self.current_schedule(selected_day=selected_day, class_letter=class_letter)
         sql = "SELECT id, class, lesson_number, academic_discipline, day_of_week " \
               "FROM timetable " \
               f"WHERE id >= {id_table_borders[0]} AND id <= {id_table_borders[1]} "
