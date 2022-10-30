@@ -31,6 +31,18 @@ class DataBase:
         ])
         return sql, tuple(parameters.values())
 
+    def load_data(self, data=[]):
+        """
+        Загрузка данных в БД
+        :param data: список данных ([])
+        :return:
+        """
+        for item in data:
+            sql = "INSERT INTO status(status_member, key_stats_1) VALUES (%s, %s);"
+            parametr = (item[0], item[1])
+            self.__cursor.execute(sql, parametr)
+            self.__connect.commit()
+
     def select_timetable_class(self, week_day=[], class_letter=[]):
         """
         Получение выборки расписания по дню недели
@@ -196,16 +208,25 @@ class DataBase:
         self.__cursor.execute(sql)
         self.__connect.commit()
 
-    def update_user(self, user_id_vk, role_id):
+    def update_user(self, user_id_vk, role_id=0, schedule_date=''):
         """
         Обновление данных пользователя
 
         :param user_id_vk: ID юзера в ВК
         :param role_id: ID роли в БД
+        :param schedule_date: Дата последнего запроса расписания.
         :return: возвращает ID юзера в БД
         """
-        sql = "UPDATE users SET role_id=%s WHERE user_id_vk=%s;"
-        parameter = (role_id, user_id_vk)
+        parameter = []
+        sql = "UPDATE users SET"
+        if role_id != 0:
+            sql += " role_id=%s"
+            parameter.append(role_id)
+        if schedule_date != '':
+            sql += " latest_schedule_date=%s"
+            parameter.append(schedule_date)
+        sql += " WHERE user_id_vk=%s;"
+        parameter.append(user_id_vk)
         self.__cursor.execute(sql, parameter)
         self.__connect.commit()
 
@@ -269,10 +290,11 @@ class DataBase:
         self.__connect.commit()
         logging.info(f'Удаление статуса {status_name}')
 
-    def current_schedule(self, selected_day=''):
+    def current_schedule(self, selected_day='', class_flow=''):
         """
         Получение начального и конечного ID таблицы timetable
-        :param selected_day: str дата выбранного дня(вида "10/24/2022")
+        :param selected_day: дата выбранного дня(вида "10/24/2022")
+        :param class_flow: обозначение потока класса
         :return: начальный и конечный id. Если таблица пуста присвоить значения 0
         """
         result = []
@@ -313,14 +335,15 @@ class DataBase:
 
     def select_time_table_activate(self, class_letter='', week_day='', selected_day=''):
         """
-        Получаем текущее активное расписание
+        Получаем текущее активное расписание для конкретного класса.
 
         :param class_letter: название запрашиваемого класса.
         :param week_day: день недели если пустой то вся неделя.
         :param selected_day: tr дата выбранного дня(вида "10/24/2022")
         :return: список активного расписания
         """
-        id_table_borders = self.current_schedule(selected_day=selected_day)  # получаем границы активного расписания
+        # получаем границы активного расписания для конкретного класса
+        id_table_borders = self.current_schedule(selected_day=selected_day, class_flow=class_letter)
         sql = "SELECT id, class, lesson_number, academic_discipline, day_of_week " \
               "FROM timetable " \
               f"WHERE id >= {id_table_borders[0]} AND id <= {id_table_borders[1]} "
@@ -365,3 +388,13 @@ class DataBase:
         self.__cursor.execute(sql)
         result = self.__cursor.fetchall()
         return result
+
+
+def get_flow(class_letter=''):
+    """
+    Получаем поток класса
+    :param class_letter: обозначение класса
+    :return: str
+    """
+    flow = str(class_letter[:-1])
+    return flow
