@@ -54,8 +54,9 @@ def send_timetable(editor_id_vk=user_admin):
             cursor.execute("INSERT INTO timetable_time_activate ("
                            "time_activate, "
                            "editor_user_id, "
+                           "class_flow, "
                            "id_timetable) "
-                           f"VALUES ('{date_time}', '{str(editor_id_vk)}', {id_first_timetable})"
+                           f"VALUES ('{date_time}', '{str(editor_id_vk)}', '{str(completed_list[0][0][:-1])}', {id_first_timetable})"
                            )
             connection.commit()
     except Exception as _ex:
