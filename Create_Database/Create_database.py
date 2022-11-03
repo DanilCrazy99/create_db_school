@@ -280,26 +280,15 @@ def db_not_main_tables(cursor):
         invitation_sent boolean NOT NULL DEFAULT false, \
         command_executable text, \
         latest_schedule_date timestamp without time zone, \
-        time_completion integer\
+        time_completion integer,\
+        id_list_chats text\
         );"
                    )
     # Таблица class_chat_link
-    cursor.execute("CREATE TABLE IF NOT EXISTS class_chat_link(\
+    cursor.execute("CREATE TABLE IF NOT EXISTS chat_link(\
         id bigserial NOT NULL PRIMARY KEY, \
-        letter text NOT NULL, \
-        link_flow_1 text, \
-        link_flow_2 text, \
-        link_flow_3 text, \
-        link_flow_4 text, \
-        link_flow_5 text, \
-        link_flow_6 text, \
-        link_flow_7 text, \
-        link_flow_8 text, \
-        link_flow_9 text, \
-        link_flow_10 text, \
-        link_flow_11 text, \
-        link_flow_12 text, \
-        link_flow_13 text \
+        title_chat text NOT NULL, \
+        link_chat text NOT NULL\
         );"
                    )
 
