@@ -287,6 +287,7 @@ def db_not_main_tables(cursor):
     # Таблица class_chat_link
     cursor.execute("CREATE TABLE IF NOT EXISTS chat_link(\
         id bigserial NOT NULL PRIMARY KEY, \
+        id_chat_vk integer NOT NULL, \
         title_chat text NOT NULL, \
         link_chat text NOT NULL\
         );"
