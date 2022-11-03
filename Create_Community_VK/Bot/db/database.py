@@ -441,6 +441,18 @@ class DataBase:
         result = self.__cursor.fetchone()
         return result
 
+    def delete_chat(self, id_chat_vk):
+        """
+        Удаление данных чата из БД
+        :param id_chat_vk:  int ID чата в ВК
+        :return:
+        """
+        sql = f"DELETE FROM chat_link WHERE id_chat_vk=%s;"
+        self.__cursor.execute(sql, id_chat_vk)
+        self.__connect.commit()
+        logging.info(f'Удаление данных чата {id_chat_vk}')
+
+
 def get_flow(class_letter=''):
     """
     Получаем поток класса
