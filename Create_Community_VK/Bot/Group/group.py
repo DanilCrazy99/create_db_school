@@ -15,37 +15,44 @@ class Group:
         # используем .vk_api() для вызова API
         self.vk_api = self.vk.get_api()
         self.list_ids = []
+        self.group_chat = []
 
     def get_chats_ids(self):
         """
         Получаем ID чатов группы
         :return: список ID чатов
         """
-        list_items = self.vk_api.messages.getConversations(count=200)
         list_ids = []
-        for a in range(len(list_items['items'])):
-            if list_items['items'][a]['conversation']['peer']['type'] == 'chat':
-                list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
+        if not self.group_chat:
+            list_items = self.vk_api.messages.getConversations(count=200)
+            for a in range(len(list_items['items'])):
+                if list_items['items'][a]['conversation']['peer']['type'] == 'chat':
+                    list_ids.append(list_items['items'][a]['conversation']['peer']['id'])
+        else:
+            for a in self.group_chat:
+                list_ids.append(a[3])
         return list_ids
 
     def get_chats(self):
         """
-        Получаем список чатов группы
+        Получаем список всех чатов группы.
 
-        :return: список чатов
+        :return: список с вложенными кортежами данных по чатам группы
+         (number class, letter class, title, id chat, list users, link_chat)
         """
         list_items = self.vk_api.messages.getConversations(count=200, group_id=group_id)
-        group_chat = []
         count_chat = len(list_items['items'])
         for a in range(count_chat):
             if list_items['items'][a]['conversation']['peer']['type'] == 'chat':
                 title_chat = list_items['items'][a]['conversation']['chat_settings']['title']
+                active_user = list_items['items'][a]['conversation']['chat_settings']['active_ids']
 
                 id_chat = list_items['items'][a]['conversation']['peer']['id']
+                link_chat = self.get_link_chats(id_chat=id_chat)
+                self.group_chat.append((title_chat[:-1], title_chat[-1:], title_chat, id_chat, active_user, link_chat))
+        self.group_chat.sort(key=lambda i: (i[0], i[1]))
 
-                group_chat.append((title_chat[:-1], title_chat[-1:], title_chat, id_chat))
-
-        return group_chat
+        return self.group_chat
 
     def get_link_chats(self, id_chat, new_link=0):
         """
@@ -62,23 +69,26 @@ class Group:
 
         :return: словарь поток классов
         """
-        chat = self.get_chats()
-        # сортируем список по 2-му ключу вложенного списка
-        sort_chat = sorted(chat, key=itemgetter(2))
+        if not self.group_chat:
+            chat = self.get_chats()
+        else:
+            chat = self.group_chat
+
         class_level = []
         level_p = 0
         level_h = 0
         if chat:
-            for a in sort_chat:
-                number_level = a[0]
-                if primary_school and int(number_level) <= LEVEL_PRIMARY:
+            for a in chat:
+                number_level = int(a[0])
+                if primary_school and number_level <= LEVEL_PRIMARY:
                     if number_level != level_p:
                         class_level.append(number_level)
                         level_p = number_level
-                if not primary_school and int(number_level) > LEVEL_PRIMARY:
+                if not primary_school and number_level > LEVEL_PRIMARY:
                     if number_level != level_h:
                         class_level.append(number_level)
                         level_h = number_level
+            class_level.sort()
         return class_level
 
     def litter_level_chat(self, level):
