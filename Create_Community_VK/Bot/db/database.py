@@ -1,10 +1,20 @@
 # -*- coding: utf-8 -*-
-
 # файл для работы с бд Postgresql
+
+import sys
+import os
 import psycopg2
 import logging
 
-from Create_Database.Config.Var_database import schoolName, user, password, host, port
+sys.path.insert(1, os.path.join(sys.path[0], '../../Create_Database'))
+sys.path.insert(1, os.path.join(sys.path[0], 'Create_Database'))
+
+from Config.Var_database import schoolName, user, password, host, port
+
+sys.path.insert(1, os.path.join(sys.path[0], '../../Create_Community_VK'))
+sys.path.insert(1, os.path.join(sys.path[0], 'Create_Community_VK'))
+
+from Bot.Group.group import Group
 
 
 class DataBase:
@@ -17,6 +27,7 @@ class DataBase:
                         port=port
         )
         self.__cursor = self.__connect.cursor()
+        self.__group = Group()
 
     @staticmethod
     def format_args(sql, parameters: dict):
@@ -390,6 +401,45 @@ class DataBase:
         result = self.__cursor.fetchall()
         return result
 
+    def insert_chat(self):
+        """
+        Добавляем данные о существующих чатах группы в таблицу чатов БД.
+        """
+        data_chat = self.__group.get_chats()
+        for item in data_chat:
+            if self.select_chat(item[3]):
+                # если запись существует обновляем её
+                self.update_chat(id_chat_vk=item[3], title_chat=item[2], link_chat=item[5])
+            else:
+                # если нет записи. то создаём
+                parameter = (item[3], item[2], item[5])
+                sql = "INSERT INTO public.chat_link(id_chat_vk, title_chat, link_chat) VALUES (%s, %s, %s);"
+                self.__cursor.execute(sql, parameter)
+                self.__connect.commit()
+
+    def update_chat(self, id_chat_vk, title_chat, link_chat):
+        """
+        Обновление данных чата.
+        :param id_chat_vk: int ID чата в ВК
+        :param title_chat: название чата
+        :param link_chat: ссылка на чат
+        :return:
+        """
+        sql = "UPDATE chat_link SET title_chat=%s, link_chat=%s WHERE id_chat_vk=%s;"
+        parameter = (title_chat, link_chat, id_chat_vk)
+        self.__cursor.execute(sql, parameter)
+        self.__connect.commit()
+
+    def select_chat(self, id_chat_vk):
+        """
+        Получение данных чата из БД
+        :param id_chat_vk:  int ID чата в ВК
+        :return:
+        """
+        sql = f"SELECT id, id_chat_vk, title_chat, link_chat FROM chat_link WHERE id_chat_vk={id_chat_vk};"
+        self.__cursor.execute(sql)
+        result = self.__cursor.fetchone()
+        return result
 
 def get_flow(class_letter=''):
     """
