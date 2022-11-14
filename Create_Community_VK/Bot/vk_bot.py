@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
-
+import sys
+import os
 import vk_api.vk_api
 import requests
 import time
 import logging
 import traceback
 
+sys.path.insert(1, os.path.join(sys.path[0], '../../Create_Community_VK'))
+
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType  # VkBotLongPoll работа от имени группы
-from Create_Community_VK.Config.token import token_group
-from Create_Community_VK.Config.Var_community import group_id
-from Create_Community_VK.Bot.db.database import DataBase
-from Create_Community_VK.Bot.Users.user import Community
-from Create_Community_VK.Bot.Group.group import Group
-from Create_Community_VK.Config.control_word import *
-from Create_Community_VK.Bot.keyboards.keyboard import controller_keyboard as control_kb
+from Config.token import token
+from Config.Var_community import group_id
+from Bot.db.database import DataBase
+from Bot.Users.user import Community
+from Bot.Group.group import Group
+from Config.control_word import control_word
+from Bot.keyboards.keyboard import controller_keyboard as control_kb
 
 
 class MyLongPoll(VkBotLongPoll):
@@ -40,7 +43,7 @@ class VkBot:
     """
     def __init__(self):
         # для longpoll
-        __api_token = token_group
+        __api_token = token
         __group_id = group_id
 
         # подключаемся к VK
@@ -103,7 +106,7 @@ class VkBot:
 
         try:
             for event in self.long_poll.listen():
-                print('входное сообщение: ', event)
+                # print('входное сообщение: ', event)
                 # кто отправил сообщение
                 if 'user_id' in event.obj:
                     self.from_id = event.obj['user_id']

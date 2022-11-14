@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from pathlib2 import Path
 
-from Create_Community_VK.Config.token import token_admin, token_group
+from Create_Community_VK.Config.token import token_admin, token
+from collections import namedtuple
 
 user_admin = 1640521
+
+# группа тестовая
 group_id = 215601456
+
+# группа школы 17
+# group_id = 217130883
+
 vk_token = token_admin
-token_group = token_group
-path_home = Path.cwd()
+token_group = token
 path_logFile = "log.log"
 
-path_timetableFile = Path(path_home, "file", "timetable.xlsx")
 # последний класс начальной школы
 LEVEL_PRIMARY = 4
 

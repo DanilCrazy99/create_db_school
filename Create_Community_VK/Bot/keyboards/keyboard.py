@@ -6,9 +6,9 @@ from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from Create_Community_VK.Bot.Users.user import Community
 from Create_Community_VK.Bot.Group.group import Group
 from Create_Community_VK.Bot.db.database import DataBase
-from Create_Community_VK.Config.msg_default import *
-from Create_Community_VK.Config.control_word import *
-from datetime import datetime, timedelta
+from Create_Community_VK.Config.msg_default import hot_contact, help_user_no_chat, help_user_chat_member
+from Create_Community_VK.Config.control_word import list_class, list_week_day, list_week_words, list_month_words
+from datetime import datetime, timedelta, date
 
 gr = Group()  # экземпляр класса Group
 db = DataBase()
@@ -25,12 +25,19 @@ def controller_keyboard(id_user_vk, role_user_vk, key_command=None):
     """
 
     # получаем данные с сервера состояний юзера
-    key_set = db.select_user_status_server(id_user_vk=id_user_vk)[2]
-    result_keyboard = None
+    if db.select_user_status_server(id_user_vk=id_user_vk):
+        key_set = db.select_user_status_server(id_user_vk=id_user_vk)[2]
+    else:
+        key_set = 1
+        status_id = db.select_status(key_stat=key_set)
+        db.insert_user_status_server(user_id_vk=id_user_vk, status_id=status_id)
+
     result_msg = ''
+    inline_keyboard = False
     flow_class = 0
     if role_user_vk == 'visitor':
         result_keyboard = generator_keyboard(set_keyboard=0)
+        result_msg = 'Вступите в нашу группу.'
     else:
         # Проверяем доступ юзера к полученной команде.
         if user.control_access_command(user_id_vk=id_user_vk):
@@ -85,11 +92,13 @@ def controller_keyboard(id_user_vk, role_user_vk, key_command=None):
                 user.set_user_status_server(id_user_vk=id_user_vk, id_status=db.select_status(key_stat=key_set))
                 result_msg = 'Основное меню.'
 
-            elif key_command in list_week_day:  # обработка по расписанию
+            elif key_command in list_week_day:  # обработка по расписанию дней недели
                 list_chat_title = user.title_chat(user_id=id_user_vk)
                 tmp_list_title = []
                 result_msg = ''
                 cycle = 0
+
+                # для обычной клавиатуры
                 for item_chat_title in list_chat_title:
                     cycle += 1
                     tmp_list_title.append(item_chat_title)
@@ -101,9 +110,17 @@ def controller_keyboard(id_user_vk, role_user_vk, key_command=None):
                         result_msg += '\n\n'
                 key_set = 4
 
-            result_keyboard = generator_keyboard(set_keyboard=key_set, id_user_vk=id_user_vk, flow_class=flow_class)
+                if cycle == 0:
+                    result_msg = 'Для запроса расписания необходимо вступить в чат своего класса.'
+                    key_set = 1
+                db.update_user(user_id_vk=id_user_vk, schedule_date=datetime.today())
+
+            result_keyboard = generator_keyboard(set_keyboard=key_set,
+                                                 id_user_vk=id_user_vk,
+                                                 flow_class=flow_class, inline=inline_keyboard)
         else:
             result_keyboard = generator_keyboard(set_keyboard=1)
+            result_msg = 'Повторите попытку'
 
     return result_msg, result_keyboard
 
@@ -176,18 +193,18 @@ def date_words(input_week_day):
     return result_word, header_timetable, selected_day
 
 
-def generator_keyboard(set_keyboard, id_user_vk=0, one_time_method=False, flow_class=0):
+def generator_keyboard(set_keyboard, id_user_vk=0, inline=False, flow_class=0):
     """
     Генератор клавиатуры согласно роли пользователя в группе.
 
     :param set_keyboard: номер набора клавиатур
     :param id_user_vk: ID пользователя в ВК
-    :param one_time_method: Метод отправки клавиатуры Inline=True или стандартная=False
+    :param inline: Метод отправки клавиатуры Inline=True или стандартная=False
     :param flow_class: номер потока класса
     :return: keyboard формат ответа json строка
     """
     result = {}
-    keyboard = VkKeyboard(one_time=one_time_method)
+    keyboard = VkKeyboard(inline=inline)
 
     if set_keyboard == 0:  # клавиатура не участника группы
         result = keyboard.get_empty_keyboard()
@@ -216,7 +233,7 @@ def generator_keyboard(set_keyboard, id_user_vk=0, one_time_method=False, flow_c
                 if count_key_row > 4:
                     count_key_row = 0
                     keyboard.add_line()  # Переход на новую строку
-                caption_key = '/' + flow
+                caption_key = '/' + str(flow)
                 keyboard.add_button(caption_key, color=VkKeyboardColor.POSITIVE)
         if count_key_row >= 4:
             keyboard.add_line()  # Переход на новую строку
@@ -234,7 +251,7 @@ def generator_keyboard(set_keyboard, id_user_vk=0, one_time_method=False, flow_c
                     count_key_row = 0
                     keyboard.add_line()  # Переход на новую строку
                 caption_key = '/чат `' + item[2] + '` класса '
-                link_chat = item[4]
+                link_chat = item[5]
                 keyboard.add_openlink_button(label=caption_key, link=link_chat)
                 count_key_row += 1
 
@@ -247,17 +264,19 @@ def generator_keyboard(set_keyboard, id_user_vk=0, one_time_method=False, flow_c
         result = keyboard.get_keyboard()
 
     elif set_keyboard == 4:  # клавиатура выбора дня недели расписания
-        keyboard.add_button('/пн', color=color_key())
-        keyboard.add_button('/вт', color=color_key())
-        keyboard.add_button('/ср', color=color_key())
-        keyboard.add_button('/чт', color=color_key())
-
-        keyboard.add_line()  # Переход на новую строку
-        # keyboard.add_location_button()
-
-        keyboard.add_button('/пт', color=color_key())
-        keyboard.add_button('/сб', color=color_key())
-        keyboard.add_button('/вс', color=color_key())
+        step = 0
+        key_week = week_dict(user_id_vk=id_user_vk)
+        for item in list_week_day:
+            flag = key_week[item[1:]]
+            if flag == 1:
+                color_key = VkKeyboardColor.NEGATIVE
+            else:
+                color_key = VkKeyboardColor.POSITIVE
+            keyboard.add_button(item, color=color_key)
+            step += 1
+            if step >= 4:
+                step = 0
+                keyboard.add_line()  # Переход на новую строку
 
         keyboard.add_line()  # Переход на новую строку
 
@@ -302,17 +321,71 @@ def generator_keyboard(set_keyboard, id_user_vk=0, one_time_method=False, flow_c
     return result
 
 
-def color_key(id_user_vk=None):
+def week_dict(user_id_vk):
     """
-    Определение цвета кнопки
-    :param id_user_vk: ID пользователя в ВК
-    :return: Описатель цвета кнопки
+    Формируем словарь дат.
+    :return: dict Словарь с данными на неделю
     """
-    result = VkKeyboardColor.POSITIVE
-    if id_user_vk:
-        # проверка на новое расписание
-        result = VkKeyboardColor.POSITIVE
-    return result
+    week_new_date = []
+    week_current = []
+    name_class = []
+    flag_day = []
+    w_key = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс']
+    # временная заглушка
+    flag_day = [1, 0, 1, 0, 0, 0, 0]
+
+    # today = date.today()
+    # week_day_now = datetime.weekday(today)
+    #
+    # all_chat = gr.get_chats()
+    # for ch in all_chat:
+    #     # проверка пользователя на участие в чате
+    #     if user_id_vk in ch[4]:
+    #         name_class.append(ch[2])
+    #
+    # for y in range(0, 7):
+    #     tt = y - week_day_now
+    #
+    #     # блок формирования текущей календарной недели
+    #     delta_day = timedelta(days=tt)
+    #     today_1 = today + delta_day
+    #     week_current.append(today_1.strftime("%Y-%m-%d"))
+    #
+    #     # блок формирования недели от текущего дня до будущего
+    #     if tt < 0:
+    #         tt += 7
+    #     delta_day = timedelta(days=tt)
+    #     today_1 = today + delta_day
+    #     week_new_date.append(today_1)
+    #
+    # for current_class in name_class:
+    #     # перебираем даты дней актуальной недели
+    #     day_step = 0
+    #     for actual_day in week_new_date:
+    #         delta_day = timedelta(days=-7)
+    #         act_day = actual_day.strftime("%Y-%m-%d")
+    #         control_day = (actual_day + delta_day).strftime("%Y-%m-%d")
+    #
+    #         # for wd in list_week_words:
+    #         wd = list_week_words[day_step]
+    #         day_step += 1
+    #         wdc = wd.capitalize()
+    #
+    #         result1 = db.select_time_table_activate(class_letter=current_class, week_day=wdc, selected_day=act_day)
+    #         result2 = db.select_time_table_activate(class_letter=current_class, week_day=wdc, selected_day=control_day)
+    #
+    #         step = 0
+    #         flag = 0
+    #         for s1 in result1:
+    #             s2 = result2[step]
+    #             step += 1
+    #             if not (s1[2] == s2[2] and s1[3] == s2[3]):
+    #                 flag = 1
+    #         # print('act_day= ', act_day, ' control_day= ', control_day, ' день- ', wdc, ' flag= ', flag)
+    #         flag_day.append(flag)
+
+    week_key = dict(zip(w_key, flag_day))
+    return week_key
 
 
 if __name__ == '__main__':

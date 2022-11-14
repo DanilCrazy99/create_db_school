@@ -35,7 +35,7 @@ class Group:
 
     def get_chats(self):
         """
-        Получаем список всех чатов группы.
+        Получаем список всех чатов группы с данными.
 
         :return: список с вложенными кортежами данных по чатам группы
          (number class, letter class, title, id chat, list users, link_chat)

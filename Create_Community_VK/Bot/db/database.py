@@ -430,15 +430,20 @@ class DataBase:
         self.__cursor.execute(sql, parameter)
         self.__connect.commit()
 
-    def select_chat(self, id_chat_vk):
+    def select_chat(self, id_chat_vk=None):
         """
         Получение данных чата из БД
         :param id_chat_vk:  int ID чата в ВК
         :return:
         """
-        sql = f"SELECT id, id_chat_vk, title_chat, link_chat FROM chat_link WHERE id_chat_vk={id_chat_vk};"
+        sql = "SELECT id, id_chat_vk, title_chat, link_chat FROM chat_link"
+        if id_chat_vk:
+            sql += f" WHERE id_chat_vk={id_chat_vk};"
+        else:
+            sql += ";"
+        # print('sql= ', sql)
         self.__cursor.execute(sql)
-        result = self.__cursor.fetchone()
+        result = self.__cursor.fetchall()
         return result
 
     def delete_chat(self, id_chat_vk):

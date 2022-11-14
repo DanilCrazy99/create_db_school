@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import vk_api
 import requests
-from Create_Community_VK.Config.Var_community import token_group, user_admin, path_timetableFile
+from Create_Community_VK.Config.Var_community import token_group, user_admin
 from Create_Community_VK.Bot.Group.group import Group
 from Create_Community_VK.Bot.db.database import DataBase
 from Create_Database.Send_timetable import send_timetable

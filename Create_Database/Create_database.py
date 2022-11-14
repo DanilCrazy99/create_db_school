@@ -281,7 +281,7 @@ def db_not_main_tables(cursor):
         command_executable text, \
         latest_schedule_date timestamp without time zone, \
         time_completion integer,\
-        id_list_chats text\
+        id_list_chats integer ARRAY\
         );"
                    )
     # Таблица class_chat_link
@@ -290,6 +290,17 @@ def db_not_main_tables(cursor):
         id_chat_vk integer NOT NULL, \
         title_chat text NOT NULL, \
         link_chat text NOT NULL\
+        );"
+                   )
+
+    # Таблица bell_for_lesson
+    cursor.execute("CREATE TABLE IF NOT EXISTS bell_for_lesson(\
+        id bigserial NOT NULL PRIMARY KEY, \
+        start_time_lesson timestamp without time zone, \
+        lesson_times  integer, \
+        break_times  integer ARRAY, \
+        lesson_times_correction  integer, \
+        break_times_correction  integer ARRAY \
         );"
                    )
 
