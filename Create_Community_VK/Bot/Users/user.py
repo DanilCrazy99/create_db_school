@@ -166,11 +166,11 @@ class Community:
                                                                                  conversation_message_ids=last_id_msg)
                     if len(list_items['items'][0]['attachments']) == 1:
                         attachment = list_items['items'][0]['attachments'][0]['doc']
-                        if attachment['ext'] == 'xlsx':
+                        if attachment['ext'] == 'xls':
                             url_value = attachment['url']
                         if url_value:
                             r = requests.get(url_value, allow_redirects=True)
-                            with open("timetable.xlsx", 'wb') as o:
+                            with open("timetable.xls", 'wb') as o:
                                 o.write(r.content)
                                 print('файл сохранён в директории')
                             o.close()

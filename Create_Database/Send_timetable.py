@@ -22,7 +22,7 @@ def send_timetable(editor_id_vk=user_admin):
             host=host,
             port=port
             )
-        completed_list, date_time = create_timetable_list()
+        completed_list, date_time = create_timetable_list()  # загружаем в переменные полученный файл Excel
         completed_list = create_postgres_list(completed_list)
         send_trigger = False
         for a in range(len(completed_list)):

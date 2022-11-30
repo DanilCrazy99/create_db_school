@@ -26,7 +26,7 @@ logging.info('Запуск бота....')
 print('загрузка данных по чатам')
 logging.info('Загрузка данных по чатам группы.')
 db = DataBase()
-db.insert_chat()
+# db.insert_chat()  # раскомментировать после тестов
 
 # запускаем бесконечный цикл
 while True:

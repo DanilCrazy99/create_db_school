@@ -156,9 +156,10 @@ class VkBot:
                     # обработка присоединённого файла
                     if len(event.obj['attachments']) != 0:
                         ext_file = event.obj['attachments'][0]['doc']['ext']
-                        if ext_file == 'xlsx':
-                            print('поступил xlsx файл')
-                            logging.info('поступил xlsx файл')
+                        # проверка файла по расширению и правам пользователя.
+                        if ext_file == 'xls':
+                            print('поступил xls файл')
+                            logging.info('поступил xls файл')
                             self.community.get_xl_file_from_msg()
                             self.send_msg('Файл добавлен в таблицу учета расписаний.')
                             continue
