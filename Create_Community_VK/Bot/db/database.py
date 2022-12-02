@@ -6,15 +6,8 @@ import os
 import psycopg2
 import logging
 
-sys.path.insert(1, os.path.join(sys.path[0], '../../Create_Database'))
-sys.path.insert(1, os.path.join(sys.path[0], 'Create_Database'))
-
-from Config.Var_database import schoolName, user, password, host, port
-
-sys.path.insert(1, os.path.join(sys.path[0], '../../Create_Community_VK'))
-sys.path.insert(1, os.path.join(sys.path[0], 'Create_Community_VK'))
-
-from Bot.Group.group import Group
+from Create_Database.Config.Var_database import schoolName, user, password, host, port
+from Create_Community_VK.Bot.Group.group import Group
 
 
 class DataBase:
@@ -41,6 +34,32 @@ class DataBase:
             f"{item} = %s" for item in parameters
         ])
         return sql, tuple(parameters.values())
+
+    def select_db(self, sql):
+        """
+        Получение данных из БД.
+        :param sql: строка SQL запроса.
+        :return:
+        """
+
+        self.__cursor = self.__connect.cursor()
+        self.__cursor.execute(sql)
+        result = self.__cursor.fetchall()
+        self.__cursor.close()
+        return result
+
+    def change_db(self, sql):
+        """
+        Изменение данных в БД
+        :param sql: строка SQL запроса.
+        :return:
+        """
+
+        self.__cursor = self.__connect.cursor()
+        self.__cursor.execute(sql)
+        self.__connect.commit()
+        self.__cursor.close()
+        return True
 
     def load_data(self, data=[]):
         """
@@ -401,11 +420,11 @@ class DataBase:
         result = self.__cursor.fetchall()
         return result
 
-    def insert_chat(self):
+    def insert_chat(self, data_chat=()):
         """
         Добавляем данные о существующих чатах группы в таблицу чатов БД.
         """
-        data_chat = self.__group.get_chats()
+        # data_chat = self.__group.get_chats()
         for item in data_chat:
             if self.select_chat(item[3]):
                 # если запись существует обновляем её
