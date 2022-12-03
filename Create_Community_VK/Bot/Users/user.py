@@ -118,6 +118,18 @@ class Community:
             list_chat_title.append(title['items'][0]['chat_settings']['title'])
         return list_chat_title
 
+    def chat_id_from_user_db(self, user_id_vk):
+        """
+        Получение списка id чатов в которых состоит юзер
+
+        :param user_id_vk: ID пользователя в ВК
+        :return: list
+        """
+        sql = f'SELECT id_list_chats FROM public.users WHERE '
+        params = {'user_id_vk': user_id_vk}
+        result = self.db.select_db(sql=sql, parameters=params)
+        return result
+
     def get_user_status_server(self, id_user_vk):
         """
         Получение статуса юзера в таблице status_server

@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import sys
-import os
-
 import time
 import logging
 import traceback
 
-sys.path.insert(1, os.path.join(sys.path[0], 'Create_Community_VK'))
-
 # подключаем конфигурацию
-from Config.Var_community import path_logFile
-from Bot.vk_bot import VkBot
-from Bot.db.database import DataBase
+from Create_Community_VK.Config.Var_community import path_logFile
+from Create_Community_VK.Bot.vk_bot import VkBot
+from Create_Community_VK.Bot.db.database import DataBase
 
 # настройка логирования
 path_log = path_logFile

@@ -4,6 +4,7 @@ from Create_Community_VK.Config.Var_community import token_group, group_id, LEVE
 from operator import itemgetter, attrgetter, methodcaller
 
 
+
 class Group:
     """
     Класс для работы с данными группы
@@ -35,7 +36,7 @@ class Group:
 
     def get_chats(self):
         """
-        Получаем список всех чатов группы с данными.
+        Получаем список всех чатов группы с данными из ВК.
 
         :return: список с вложенными кортежами данных по чатам группы
          (number class, letter class, title, id chat, list users, link_chat)
@@ -54,6 +55,7 @@ class Group:
 
         return self.group_chat
 
+
     def get_link_chats(self, id_chat, new_link=0):
         """
         Получение ссылки на чат по его ID.
@@ -69,10 +71,13 @@ class Group:
 
         :return: словарь поток классов
         """
+        # получаем данные по чатам из ВК
         if not self.group_chat:
             chat = self.get_chats()
         else:
             chat = self.group_chat
+
+        # получаем данные по чатам из БД
 
         class_level = []
         level_p = 0

@@ -22,28 +22,32 @@ class DataBase:
         self.__cursor = self.__connect.cursor()
         self.__group = Group()
 
-    @staticmethod
-    def format_args(sql, parameters: dict):
+    def format_args(self, body_sql, parameters: dict):
         """
         Создание параметра запроса для WHERE с условием AND
-        :param sql: начальная часть запроса с WHERE
+        :param body_sql: начальная часть запроса с WHERE
         :param parameters: именованный словарь с условиями. пример: {"поле_БД": переменная по которой будет выборка}
         :return: строка SQL запроса и словарь из параметров
         """
-        sql += " AND ".join([
+        body_sql += " AND ".join([
             f"{item} = %s" for item in parameters
         ])
-        return sql, tuple(parameters.values())
+        body_sql += ';'
+        return body_sql, tuple(parameters.values())
 
-    def select_db(self, sql):
+    def select_db(self, sql, parameters=None):
         """
         Получение данных из БД.
         :param sql: строка SQL запроса.
+        :param parameters: именованный словарь с условиями. пример: {"поле_БД": значение по которому будет выборка}
         :return:
         """
+        if not parameters:
+            parameters = {}
+        sql, parameter = self.format_args(body_sql=sql, parameters=parameters)
 
         self.__cursor = self.__connect.cursor()
-        self.__cursor.execute(sql)
+        self.__cursor.execute(sql, parameter)
         result = self.__cursor.fetchall()
         self.__cursor.close()
         return result
@@ -69,8 +73,8 @@ class DataBase:
         """
         for item in data:
             sql = "INSERT INTO status(status_member, key_stats_1) VALUES (%s, %s);"
-            parametr = (item[0], item[1])
-            self.__cursor.execute(sql, parametr)
+            parameter = (item[0], item[1])
+            self.__cursor.execute(sql, parameter)
             self.__connect.commit()
 
     def select_timetable_class(self, week_day=[], class_letter=[]):
@@ -328,6 +332,8 @@ class DataBase:
         :return: начальный и конечный id. Если таблица пуста присвоить значения 0
         """
         result = []
+        start_id = 0
+        stop_id = 0
         # Запрос получения данных относительно текущего календарного дня
         # с сортировкой заливки файла от последнего к первому.
         sql = "SELECT id, time_update, time_activate, editor_user_id, id_timetable " \
@@ -336,9 +342,10 @@ class DataBase:
               f"ORDER BY time_activate DESC;"  # LOCALTIMESTAMP
         self.__cursor.execute(sql)
         response = self.__cursor.fetchone()
-        start_id = response[4]  # получение начала в таблице time_table
-        id_start_activate = response[0]
-        stop_id = self.next_post_id_activate(id_start_activate)  # получение окончания в таблице time_table
+        if response:
+            start_id = response[4]  # получение начала в таблице time_table
+            id_start_activate = response[0]
+            stop_id = self.next_post_id_activate(id_start_activate)  # получение окончания в таблице time_table
 
         result.append(start_id)
         result.append(stop_id)
@@ -424,7 +431,7 @@ class DataBase:
         """
         Добавляем данные о существующих чатах группы в таблицу чатов БД.
         """
-        # data_chat = self.__group.get_chats()
+        data_chat = self.__group.get_chats()
         for item in data_chat:
             if self.select_chat(item[3]):
                 # если запись существует обновляем её

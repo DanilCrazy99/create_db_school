@@ -6,6 +6,7 @@ from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from Create_Community_VK.Bot.Users.user import Community
 from Create_Community_VK.Bot.Group.group import Group
 from Create_Community_VK.Bot.db.database import DataBase
+from Create_Community_VK.Bot.Chat.chat import Chat
 from Create_Community_VK.Config.msg_default import hot_contact, help_user_no_chat, help_user_chat_member
 from Create_Community_VK.Config.control_word import list_class, list_week_day, list_week_words, list_month_words
 from datetime import datetime, timedelta, date
@@ -13,11 +14,12 @@ from datetime import datetime, timedelta, date
 gr = Group()  # экземпляр класса Group
 db = DataBase()
 user = Community()
+chat = Chat()
 
 
 def controller_keyboard(id_user_vk, role_user_vk, key_command=None):
     """
-
+    Контроллер клавиатуры
     :param id_user_vk: ID пользователя в ВК
     :param role_user_vk: str Роль пользователя в ВК
     :param key_command: полученная команда из сообщения
@@ -93,7 +95,7 @@ def controller_keyboard(id_user_vk, role_user_vk, key_command=None):
                 result_msg = 'Основное меню.'
 
             elif key_command in list_week_day:  # обработка по расписанию дней недели
-                list_chat_title = user.title_chat(user_id=id_user_vk)
+                list_chat_title = chat.title_chat(user_id_vk=id_user_vk)
                 tmp_list_title = []
                 result_msg = ''
                 cycle = 0
@@ -141,7 +143,7 @@ def daily_lesson_schedule(class_letter=['5Б'], week_day=['Вторник'], sel
         str_table += '\n' + str(data_week[2])  # номер урока
         str_table += ' - ' + data_week[3]  # предмет
     if circle == 0:
-        str_table = '\n*** нет занятий ***'
+        str_table = '\n*** нет расписания ***'
 
     return str_table
 
@@ -182,6 +184,8 @@ def date_words(input_week_day):
     else:
         day_week = week_words[tomorrow_week_day]
     number_month = int(tomorrow.strftime('%m'))
+    if number_month == 12:
+        number_month = 0
 
     # формируем шапку расписания на день
     header_timetable = f'на {day_week}, {tomorrow.strftime("%d")} ' \
@@ -223,7 +227,7 @@ def generator_keyboard(set_keyboard, id_user_vk=0, inline=False, flow_class=0):
         primary_school = False
         if set_keyboard == 2:
             primary_school = True
-        list_flow = gr.grouping_chats_level(primary_school=primary_school)
+        list_flow = chat.grouping_chats_number(primary_school=primary_school)
         count_flow = len(list_flow)
         count_key_row = 0  # счетчик кол-ва клавиш в ряду
         if count_flow != 0:
@@ -243,7 +247,7 @@ def generator_keyboard(set_keyboard, id_user_vk=0, inline=False, flow_class=0):
         result = keyboard.get_keyboard()
 
     elif set_keyboard == 3 and flow_class > 0:  # клавиатура внутри потока и ссылками на чаты
-        list_litter_class = gr.litter_level_chat(flow_class)  # передать номер потока в int
+        list_litter_class = chat.litter_level_chat(flow_class)  # передать номер потока в int
         count_key_row = 0
         if list_litter_class:
             for item in list_litter_class:
@@ -251,13 +255,13 @@ def generator_keyboard(set_keyboard, id_user_vk=0, inline=False, flow_class=0):
                     count_key_row = 0
                     keyboard.add_line()  # Переход на новую строку
                 caption_key = '/чат `' + item[2] + '` класса '
-                link_chat = item[5]
+                link_chat = item[3]
                 keyboard.add_openlink_button(label=caption_key, link=link_chat)
                 count_key_row += 1
 
         keyboard.add_line()  # Переход на новую строку
         # если юзер участник чата, то добавить кнопку "/к расписанию"
-        if user.check_is_member_chat(user_id=id_user_vk):
+        if chat.title_chat(user_id_vk=id_user_vk):
             keyboard.add_button('/к расписанию', color=VkKeyboardColor.POSITIVE)
         keyboard.add_button('/назад', color=VkKeyboardColor.PRIMARY)
 
@@ -332,7 +336,7 @@ def week_dict(user_id_vk):
     flag_day = []
     w_key = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс']
     # временная заглушка
-    flag_day = [1, 0, 1, 0, 0, 0, 0]
+    flag_day = [0, 0, 0, 0, 0, 0, 0]
 
     # today = date.today()
     # week_day_now = datetime.weekday(today)
