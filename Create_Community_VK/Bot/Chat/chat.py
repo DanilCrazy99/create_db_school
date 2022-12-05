@@ -95,14 +95,15 @@ class Chat:
         list_chat_title = []
         sql = 'SELECT id, id_chat_vk, title_chat, link_chat	FROM chat_link'
         # Создаем SQL запрос. Проверка на пустоту первого элемента списка ID чатов.
-        if len(list_chat_id_user_db[0]) != 0:
-            sql += ' WHERE'
-            sql += " OR ".join([
-                f" id = {item}" for item in list_chat_id_user_db[0]
-            ])
-            sql += ';'
+        if list_chat_id_user_db[0]:
+            if len(list_chat_id_user_db[0]) != 0:
+                sql += ' WHERE'
+                sql += " OR ".join([
+                    f" id = {item}" for item in list_chat_id_user_db[0]
+                ])
+                sql += ';'
 
-            result = self.db.select_db(sql=sql)
+                result = self.db.select_db(sql=sql)
 
         for items in result:
             # вытаскиваем Названия чатов.

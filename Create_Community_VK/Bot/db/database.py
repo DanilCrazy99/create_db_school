@@ -21,6 +21,7 @@ class DataBase:
         )
         self.__cursor = self.__connect.cursor()
         self.__group = Group()
+        self.list_role = []
 
     def format_args(self, body_sql, parameters: dict):
         """
@@ -178,15 +179,15 @@ class DataBase:
             self.__connect.commit()
             logging.info(f'Добавлен пользователь в таб status_server {user_id_vk} на {status_id}')
 
-    def select_user(self, user_id):
+    def select_user(self, user_id_vk):
         """
         Получение текущего данных юзера.
 
-        :param user_id: идентификатор пользователя в ВК
+        :param user_id_vk: идентификатор пользователя в ВК
         :return: возвращает данные по юзеру
         """
         sql = f"SELECT user_id_vk, role_id, invitation_sent, command_executable, time_completion " \
-              f"FROM users WHERE user_id_vk={user_id};"
+              f"FROM users WHERE user_id_vk={user_id_vk};"
         self.__cursor.execute(sql)
         result = self.__cursor.fetchone()  # получение единичной записи
         return result
@@ -200,12 +201,13 @@ class DataBase:
         :return: возвращает ID юзера в БД
         """
         # проверка на наличие в БД юзера с пришедшим ID
-        result = self.select_user(user_id=user_id)
+        result = self.select_user(user_id_vk=user_id)
+        self.list_role.append(role_id)
         if not result:
             sql = "INSERT INTO users(user_id_vk, role_id, invitation_sent) VALUES (%s, %s, %s) RETURNING id;"
             # параметр invitation_sent ставим в False (не отправлено)
             invitation = False
-            parameter = (user_id, role_id, invitation)
+            parameter = (user_id, self.list_role, invitation)
             self.__cursor.execute(sql, parameter)
             id_user_db = self.__cursor.fetchone()[0]
             self.__connect.commit()
@@ -254,8 +256,10 @@ class DataBase:
         parameter = []
         sql = "UPDATE users SET"
         if role_id != 0:
+            # получить список ролей и обновить его
+            list_role = self.new_list_role(role_id_db=role_id, user_id_vk=user_id_vk)
             sql += " role_id=%s"
-            parameter.append(role_id)
+            parameter.append(list_role)
         if schedule_date != '':
             sql += " latest_schedule_date=%s"
             parameter.append(schedule_date)
@@ -263,6 +267,25 @@ class DataBase:
         parameter.append(user_id_vk)
         self.__cursor.execute(sql, parameter)
         self.__connect.commit()
+
+    def new_list_role(self, role_id_db, user_id_vk):
+        """
+        обновление списка ролей
+        :return: list role
+        """
+        list_role = self.select_user(user_id_vk=user_id_vk)[1]
+        new_role_flag = 1  # флаг добавления новой роли
+
+        if self.select_id_role(role='visitor') == role_id_db:
+            # если роль меняется на visitor, то все роли удаляются оставляем только visitor
+            new_role_flag = 0  # сброс флага новой роли
+            list_role.clear()
+            list_role.append(role_id_db)
+
+        if new_role_flag == 1:
+            if not (role_id_db in list_role):
+                list_role.append(role_id_db)
+        return list_role
 
     def select_id_role(self, role):
         """
@@ -272,6 +295,7 @@ class DataBase:
         :return: int ID роли в БД.
         """
         sql = f"SELECT id, role, description FROM role WHERE role='{role}';"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         request = self.__cursor.fetchone()  # получение единичной записи
         if not request:
@@ -336,10 +360,11 @@ class DataBase:
         stop_id = 0
         # Запрос получения данных относительно текущего календарного дня
         # с сортировкой заливки файла от последнего к первому.
+        # убрал условие по классу  AND class_flow = '{get_flow(class_letter)}'
         sql = "SELECT id, time_update, time_activate, editor_user_id, id_timetable " \
               "FROM timetable_time_activate " \
-              f"WHERE time_activate <= '{selected_day}' AND class_flow = '{get_flow(class_letter)}' " \
-              f"ORDER BY time_activate DESC;"  # LOCALTIMESTAMP
+              f"WHERE time_activate <= '{selected_day}' AND active = true " \
+              f"ORDER BY id DESC;"  # LOCALTIMESTAMP
         self.__cursor.execute(sql)
         response = self.__cursor.fetchone()
         if response:
@@ -377,7 +402,7 @@ class DataBase:
 
         :param class_letter: название запрашиваемого класса.
         :param week_day: день недели если пустой то вся неделя.
-        :param selected_day: tr дата выбранного дня(вида "10/24/2022")
+        :param selected_day: дата выбранного дня(вида "10/24/2022")
         :return: список активного расписания
         """
         # получаем границы активного расписания для конкретного класса
@@ -442,6 +467,20 @@ class DataBase:
                 sql = "INSERT INTO public.chat_link(id_chat_vk, title_chat, link_chat) VALUES (%s, %s, %s);"
                 self.__cursor.execute(sql, parameter)
                 self.__connect.commit()
+
+    def editor_time_table_db(self):
+        """
+        Получить список редакторов расписания.
+        :return: list user editor time_table
+        """
+        list_editor = ['creator', 'editor_time_table']
+        sql = 'SELECT user_id_vk FROM users INNER JOIN role on role.id = users.role_id WHERE '
+        sql += " AND ".join([
+            f" role.role = '{item}'" for item in list_editor
+            ])
+        sql += ';'
+        result = self.select_db(sql=sql)
+        return result
 
     def update_chat(self, id_chat_vk, title_chat, link_chat):
         """

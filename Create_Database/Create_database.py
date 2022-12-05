@@ -205,7 +205,8 @@ def db_main_tables(cursor):
         time_activate timestamp without time zone, \
         editor_user_id integer, \
         class_flow text NOT NULL, \
-        id_timetable integer\
+        id_timetable integer,\
+        active boolean NOT NULL DEFAULT true\
         );"
                    )
 
@@ -276,7 +277,7 @@ def db_not_main_tables(cursor):
     cursor.execute("CREATE TABLE IF NOT EXISTS users(\
         id bigserial NOT NULL PRIMARY KEY, \
         user_id_vk integer NOT NULL, \
-        role_id integer DEFAULT 0, \
+        role_id integer ARRAY, \
         invitation_sent boolean NOT NULL DEFAULT false, \
         command_executable text, \
         latest_schedule_date timestamp without time zone, \

@@ -145,3 +145,5 @@ class Group:
                                                       'filter': 'managers'})
         # достаем список администраторов группы
         return result['items']
+
+

@@ -148,16 +148,23 @@ class VkBot:
                 # обработка поступившего личного сообщения
                 if event.type == VkBotEventType.MESSAGE_NEW:
                     self.new_msg = self.correct_msg(event.obj['text'])
+                    logging.info(f'Поступило сообщение "{self.new_msg}" от  {self.from_id}')
 
                     # обработка присоединённого файла
                     if len(event.obj['attachments']) != 0:
                         ext_file = event.obj['attachments'][0]['doc']['ext']
                         # проверка файла по расширению и правам пользователя.
                         if ext_file == 'xls':
-                            print('поступил xls файл')
-                            logging.info('поступил xls файл')
-                            self.community.get_xl_file_from_msg()
-                            self.send_msg('Файл добавлен в таблицу учета расписаний.')
+                            sql = f'SELECT role_id FROM users WHERE user_id_vk={self.from_id}'
+                            list_role_user = self.db.select_db(sql=sql)[0][0]
+                            role_editor = self.db.select_id_role(role='editor_time_table')
+                            if role_editor in list_role_user:
+                                print('поступил xls файл')
+                                logging.info('поступил xls файл')
+                                self.community.get_xl_file_from_msg()
+                                self.send_msg('Файл добавлен в таблицу учета расписаний.')
+                            else:
+                                self.send_msg('Нет прав для загрузки расписания.')
                             continue
 
                     # проверка допустимости команды
