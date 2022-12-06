@@ -405,18 +405,14 @@ class DataBase:
         :param selected_day: дата выбранного дня(вида "10/24/2022")
         :return: список активного расписания
         """
-        # получаем границы активного расписания для конкретного класса
-        id_table_borders = self.current_schedule(selected_day=selected_day, class_letter=class_letter)
-        sql = "SELECT id, class, lesson_number, academic_discipline, day_of_week " \
-              "FROM timetable " \
-              f"WHERE id >= {id_table_borders[0]} AND id <= {id_table_borders[1]} "
-        if class_letter != '':
-            sql += f" AND class = '{class_letter}' "
-        if week_day != '':
-            sql += f" AND day_of_week = '{week_day}' "
-        sql += "ORDER BY class, day_of_week, lesson_number ASC;"
+
+        sql = "SELECT class, lesson_number, academic_discipline, day_of_week, timetable.id_timetable " \
+              "FROM timetable INNER JOIN timetable_time_activate " \
+              "ON timetable.id_timetable = timetable_time_activate.id " \
+              f"WHERE class = '{class_letter}' AND time_activate <= '{selected_day}' AND day_of_week = '{week_day}'" \
+              "	ORDER BY lesson_number ASC;"
         self.__cursor.execute(sql)
-        response = self.__cursor.fetchall()  # получение последнего ID в time_table
+        response = self.__cursor.fetchall()  # получение расписания на день
         return response
 
     def select_user_data(self, id_user_vk):
