@@ -161,7 +161,7 @@ class VkBot:
                             if role_editor in list_role_user:
                                 print('поступил xls файл')
                                 logging.info('поступил xls файл')
-                                self.community.get_xl_file_from_msg()
+                                self.community.get_xl_file_from_msg(id_editor=self.from_id)
                                 self.send_msg('Файл добавлен в таблицу учета расписаний.')
                             else:
                                 self.send_msg('Нет прав для загрузки расписания.')

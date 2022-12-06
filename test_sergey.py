@@ -17,8 +17,9 @@ if __name__ == '__main__':
     # print(result_user, result_chat)
 
     # получаем края ID актуального расписания
-    result = db.current_schedule(selected_day='03/12/2022')
-    print('current_schedule= ', result)
+    # result = db.current_schedule(selected_day='03/12/2022')
+    # print('current_schedule= ', result)
     # получаем расписание на один день
-    res = db.editor_time_table_db()
+    # res = db.editor_time_table_db()
+    res = week_dict(user_id_vk=user_id_vk)
     print('editors= ', res)

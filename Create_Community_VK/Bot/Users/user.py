@@ -4,7 +4,7 @@ import requests
 from Create_Community_VK.Config.Var_community import token_group, user_admin
 from Create_Community_VK.Bot.Group.group import Group
 from Create_Community_VK.Bot.db.database import DataBase
-from Create_Database.Send_timetable import send_timetable
+from Create_Database.Create_timetable import create_timetable_list
 
 
 class Community:
@@ -187,5 +187,5 @@ class Community:
                                 print('файл сохранён в директории')
                             o.close()
                             # запускаем загрузку данных в БД
-                            send_timetable()
+                            create_timetable_list(user_id_vk=id_editor)
 

@@ -30,6 +30,17 @@ class Chat:
         result = self.db.select_db(sql=sql, parameters=params)
         return result
 
+    def list_chat_with_users(self):
+        """
+        Список чатов со списком ID участников
+        :return: list of chat
+        """
+        sql = 'SELECT user_id_vk, title_chat ' \
+              'FROM users INNER JOIN chat_link ON chat_link.id = ANY(users.id_list_chats);'
+        params = {}
+        result = self.db.select_db(sql=sql, parameters=params)
+        return result
+
     def number_letter_chat(self, title_chat):
         """
         Создаем список вида (цифра, буква)

@@ -338,55 +338,57 @@ def week_dict(user_id_vk):
     # временная заглушка
     flag_day = [0, 0, 0, 0, 0, 0, 0]
 
-    # today = date.today()
-    # week_day_now = datetime.weekday(today)
-    #
-    # all_chat = gr.get_chats()
-    # for ch in all_chat:
-    #     # проверка пользователя на участие в чате
-    #     if user_id_vk in ch[4]:
-    #         name_class.append(ch[2])
-    #
-    # for y in range(0, 7):
-    #     tt = y - week_day_now
-    #
-    #     # блок формирования текущей календарной недели
-    #     delta_day = timedelta(days=tt)
-    #     today_1 = today + delta_day
-    #     week_current.append(today_1.strftime("%Y-%m-%d"))
-    #
-    #     # блок формирования недели от текущего дня до будущего
-    #     if tt < 0:
-    #         tt += 7
-    #     delta_day = timedelta(days=tt)
-    #     today_1 = today + delta_day
-    #     week_new_date.append(today_1)
-    #
-    # for current_class in name_class:
-    #     # перебираем даты дней актуальной недели
-    #     day_step = 0
-    #     for actual_day in week_new_date:
-    #         delta_day = timedelta(days=-7)
-    #         act_day = actual_day.strftime("%Y-%m-%d")
-    #         control_day = (actual_day + delta_day).strftime("%Y-%m-%d")
-    #
-    #         # for wd in list_week_words:
-    #         wd = list_week_words[day_step]
-    #         day_step += 1
-    #         wdc = wd.capitalize()
-    #
-    #         result1 = db.select_time_table_activate(class_letter=current_class, week_day=wdc, selected_day=act_day)
-    #         result2 = db.select_time_table_activate(class_letter=current_class, week_day=wdc, selected_day=control_day)
-    #
-    #         step = 0
-    #         flag = 0
-    #         for s1 in result1:
-    #             s2 = result2[step]
-    #             step += 1
-    #             if not (s1[2] == s2[2] and s1[3] == s2[3]):
-    #                 flag = 1
-    #         # print('act_day= ', act_day, ' control_day= ', control_day, ' день- ', wdc, ' flag= ', flag)
-    #         flag_day.append(flag)
+    # **************************************************
+    today = date.today()
+    week_day_now = datetime.weekday(today)
+
+    all_chat = chat.list_chat_with_users()
+    for item in all_chat:
+        # проверка пользователя на участие в чате
+        if user_id_vk == item[0]:
+            name_class.append(item[1])
+
+    for y in range(0, 7):
+        tt = y - week_day_now
+
+        # блок формирования текущей календарной недели
+        delta_day = timedelta(days=tt)
+        today_1 = today + delta_day
+        week_current.append(today_1.strftime("%Y-%m-%d"))
+
+        # блок формирования недели от текущего дня до будущего
+        if tt < 0:
+            tt += 7
+        delta_day = timedelta(days=tt)
+        today_1 = today + delta_day
+        week_new_date.append(today_1)
+
+    for current_class in name_class:
+        # перебираем даты дней актуальной недели
+        day_step = 0
+        for actual_day in week_new_date:
+            delta_day = timedelta(days=-7)
+            act_day = actual_day.strftime("%Y-%m-%d")
+            control_day = (actual_day + delta_day).strftime("%Y-%m-%d")
+
+            # for wd in list_week_words:
+            wd = list_week_words[day_step]
+            day_step += 1
+            wdc = wd.capitalize()
+
+            result1 = db.select_time_table_activate(class_letter=current_class, week_day=wdc, selected_day=act_day)
+            result2 = db.select_time_table_activate(class_letter=current_class, week_day=wdc, selected_day=control_day)
+
+            step = 0
+            flag = 0
+            for s1 in result1:
+                s2 = result2[step]
+                step += 1
+                if not (s1[2] == s2[2] and s1[3] == s2[3]):
+                    flag = 1
+            # print('act_day= ', act_day, ' control_day= ', control_day, ' день- ', wdc, ' flag= ', flag)
+            flag_day.append(flag)
+    # ************************************
 
     week_key = dict(zip(w_key, flag_day))
     return week_key

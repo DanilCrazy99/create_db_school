@@ -2,6 +2,7 @@
 
 import openpyxl
 import xlrd
+from Create_Database.Send_timetable import send_timetable
 
 # имя загружаемого файла
 tmp_path = 'timetable.xls'
@@ -59,9 +60,11 @@ def create_timetable_list_xlsx(path=tmp_path):
                                 list_lessons.append([])
     return list_lessons, date_time
 
-def create_timetable_list(path=tmp_path):
+
+def create_timetable_list(user_id_vk, path=tmp_path):
     """
     Чтение только файла XLS
+    :param user_id_vk: ID пользователя в ВК
     :param path: Путь к файлу
     :return:
     """
@@ -132,15 +135,14 @@ def create_timetable_list(path=tmp_path):
                                     list_lessons[incr].append(sheet[rows+1][0].value)  # день недели урока
                                 list_lessons.append([])
 
-    return list_lessons, date_time
+            # отправляем данные на загрузку в БД
+            send_timetable(editor_id_vk=user_id_vk, timetable_list=list_lessons, data_sheet=date_time)
+            # очищаем переменные листа данных
+            list_lessons.clear()
+            list_lessons.append([])
 
+    return True
 
-def create_postgres_list(list_func):
-    completed_list = []
-    for a in range(len(list_func)):
-        if len(list_func[a]) != 0:
-            completed_list.append(list_func[a])
-    return completed_list
 
 if __name__ == '__main__':
     create_timetable_list()
