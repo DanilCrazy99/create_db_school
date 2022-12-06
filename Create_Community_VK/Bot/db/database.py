@@ -405,14 +405,37 @@ class DataBase:
         :param selected_day: дата выбранного дня(вида "10/24/2022")
         :return: список активного расписания
         """
+        # получить один ID ближайшего активного расписания.
+        id_activate_time_table = self.select_one_activate_timetable(class_letter=class_letter,
+                                                                    week_day=week_day,
+                                                                    selected_day=selected_day)
 
-        sql = "SELECT class, lesson_number, academic_discipline, day_of_week, timetable.id_timetable " \
-              "FROM timetable INNER JOIN timetable_time_activate " \
-              "ON timetable.id_timetable = timetable_time_activate.id " \
-              f"WHERE class = '{class_letter}' AND time_activate <= '{selected_day}' AND day_of_week = '{week_day}'" \
+        sql = "SELECT class, lesson_number, academic_discipline, day_of_week " \
+              "FROM timetable " \
+              f"WHERE class = '{class_letter}' " \
+              f"AND id_timetable = '{id_activate_time_table}' " \
+              f"AND day_of_week = '{week_day}'" \
               "	ORDER BY lesson_number ASC;"
         self.__cursor.execute(sql)
         response = self.__cursor.fetchall()  # получение расписания на день
+        return response
+
+    def select_one_activate_timetable(self, class_letter='', week_day='', selected_day=''):
+        """
+        получить один ID ближайшего активного расписания.
+        :return: ID активного расписания
+        """
+        sql = "SELECT timetable_time_activate.id " \
+              "FROM timetable INNER JOIN timetable_time_activate " \
+              "ON timetable.id_timetable = timetable_time_activate.id " \
+              f"WHERE class = '{class_letter}' AND time_activate <= '{selected_day}' AND day_of_week = '{week_day}'" \
+              "	ORDER BY time_activate, timetable_time_activate.id ASC;"
+        self.__cursor.execute(sql)
+        response = self.__cursor.fetchone()  # получение ID активного расписания
+        if response:
+            response = response[0]
+        else:
+            response = 0
         return response
 
     def select_user_data(self, id_user_vk):
