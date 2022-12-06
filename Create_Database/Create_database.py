@@ -195,7 +195,8 @@ def db_main_tables(cursor):
         class text NOT NULL, \
         lesson_number integer NOT NULL, \
         academic_discipline text NOT NULL, \
-        day_of_week text NOT NULL\
+        day_of_week text NOT NULL, \
+        id_timetable integer NOT NULL \
         );"
                    )
 
