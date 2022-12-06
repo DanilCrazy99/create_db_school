@@ -19,7 +19,7 @@ class DataBase:
                         host=host,
                         port=port
         )
-        self.__cursor = self.__connect.cursor()
+        self.__cursor = ''  # self.__connect.cursor()
         self.__group = Group()
         self.list_role = []
 
@@ -75,8 +75,10 @@ class DataBase:
         for item in data:
             sql = "INSERT INTO status(status_member, key_stats_1) VALUES (%s, %s);"
             parameter = (item[0], item[1])
+            self.__cursor = self.__connect.cursor()
             self.__cursor.execute(sql, parameter)
             self.__connect.commit()
+            self.__cursor.close()
 
     def select_timetable_class(self, week_day=[], class_letter=[]):
         """
@@ -93,14 +95,17 @@ class DataBase:
               f"FROM timetable WHERE ({sql_class_letter}) AND ({sql_week}) " \
               "ORDER BY class, day_of_week, lesson_number ASC ;"
 
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         result = self.__cursor.fetchall()
+        self.__cursor.close()
         return result
 
     def select_roles_with_vk_id(self, id_user):
         """
         Проверка на наличие специфичной роли в postgres
         """
+        self.__cursor = self.__connect.cursor()
         with self.__cursor() as cursor:
             cursor.execute(
                 "SELECT * FROM role INNER JOIN users ON role.id = users.role_id;"
@@ -125,8 +130,10 @@ class DataBase:
         :param status_name: описание статуса
         """
         sql = "INSERT INTO status(status) VALUES (%s);"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql, status_name)
         self.__connect.commit()
+        self.__cursor.close()
         logging.info(f'Добавлен новый статус {status_name}')
 
     def update_status_user(self, id_user_vk, number_status):
@@ -137,8 +144,10 @@ class DataBase:
         """
         sql = "UPDATE status_server SET id_status=%s WHERE id_user_vk=%s;"
         params = (number_status, id_user_vk)
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql, params)
         self.__connect.commit()
+        self.__cursor.close()
 
     def select_status(self, key_stat):
         """
@@ -147,8 +156,10 @@ class DataBase:
         :return: int
         """
         sql = f"SELECT id FROM status WHERE key_stats_1 = {key_stat};"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         result = self.__cursor.fetchone()  # получение единичной записи
+        self.__cursor.close()
         return result
 
     def select_user_status_server(self, id_user_vk):
@@ -161,8 +172,10 @@ class DataBase:
         sql = "SELECT status_server.id_status, status.status_member, status.key_stats_1 " \
               "FROM status_server INNER JOIN status ON status_server.id_status=status.id " \
               f"WHERE status_server.id_user_vk={id_user_vk};"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         result = self.__cursor.fetchone()  # получение единичной записи
+        self.__cursor.close()
         return result
 
     def insert_user_status_server(self, user_id_vk, status_id):
@@ -175,8 +188,10 @@ class DataBase:
         if not self.select_user_status_server(id_user_vk=user_id_vk):
             sql = "INSERT INTO status_server(id_user_vk, id_status) VALUES (%s, %s);"
             parameter = (user_id_vk, status_id)
+            self.__cursor = self.__connect.cursor()
             self.__cursor.execute(sql, parameter)
             self.__connect.commit()
+            self.__cursor.close()
             logging.info(f'Добавлен пользователь в таб status_server {user_id_vk} на {status_id}')
 
     def select_user(self, user_id_vk):
@@ -188,8 +203,10 @@ class DataBase:
         """
         sql = f"SELECT user_id_vk, role_id, invitation_sent, command_executable, time_completion " \
               f"FROM users WHERE user_id_vk={user_id_vk};"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         result = self.__cursor.fetchone()  # получение единичной записи
+        self.__cursor.close()
         return result
 
     def insert_user(self, user_id, role_id):
@@ -208,9 +225,11 @@ class DataBase:
             # параметр invitation_sent ставим в False (не отправлено)
             invitation = False
             parameter = (user_id, self.list_role, invitation)
+            self.__cursor = self.__connect.cursor()
             self.__cursor.execute(sql, parameter)
             id_user_db = self.__cursor.fetchone()[0]
             self.__connect.commit()
+            self.__cursor.close()
             logging.info(f'У нас новый член группы id={user_id}')
             return id_user_db
         else:  # иначе обновляем данные по юзеру
@@ -227,8 +246,10 @@ class DataBase:
         """
         result = False
         sql = f"SELECT invitation_sent FROM users WHERE user_id_vk={user_id_vk};"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         response = self.__cursor.fetchone()  # получение единичной записи
+        self.__cursor.close()
         if response:
             result = response[0]
         return result
@@ -241,8 +262,10 @@ class DataBase:
         :param invitation: статус отправки приглашения пользователю
         """
         sql = f"UPDATE users SET invitation_sent={invitation} WHERE user_id_vk={user_id_vk};"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         self.__connect.commit()
+        self.__cursor.close()
 
     def update_user(self, user_id_vk, role_id=0, schedule_date=''):
         """
@@ -265,8 +288,10 @@ class DataBase:
             parameter.append(schedule_date)
         sql += " WHERE user_id_vk=%s;"
         parameter.append(user_id_vk)
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql, parameter)
         self.__connect.commit()
+        self.__cursor.close()
 
     def new_list_role(self, role_id_db, user_id_vk):
         """
@@ -298,6 +323,7 @@ class DataBase:
         self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         request = self.__cursor.fetchone()  # получение единичной записи
+        self.__cursor.close()
         if not request:
             # Добавляем новую роль
             result = self.insert_role(role_name=role)
@@ -319,9 +345,11 @@ class DataBase:
         else:
             parameter = (role_name, role_desc)
             sql = "INSERT INTO role(role, description) VALUES (%s, %s) RETURNING id;"
+            self.__cursor = self.__connect.cursor()
             self.__cursor.execute(sql, parameter)
             result = self.__cursor.fetchone()[0]
             self.__connect.commit()
+            self.__cursor.close()
             logging.info(f'Добавлена новая роль {role_name}')
         return result
 
@@ -332,8 +360,10 @@ class DataBase:
         :return: int значение key_stats_1
         """
         sql = f"SELECT key_stats_1 FROM status WHERE id={status_id};"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         result = self.__cursor.fetchone()  # получение единичной записи
+        self.__cursor.close()
         return result
 
     # удаление описателя статуса
@@ -344,8 +374,10 @@ class DataBase:
         :param status_name: str Имя статуса.
         """
         sql = "DELETE FROM status WHERE id = %s;"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql, status_name)
         self.__connect.commit()
+        self.__cursor.close()
         logging.info(f'Удаление статуса {status_name}')
 
     def current_schedule(self, selected_day='', class_letter=''):
@@ -365,8 +397,10 @@ class DataBase:
               "FROM timetable_time_activate " \
               f"WHERE time_activate <= '{selected_day}' AND active = true " \
               f"ORDER BY id DESC;"  # LOCALTIMESTAMP
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         response = self.__cursor.fetchone()
+        self.__cursor.close()
         if response:
             start_id = response[4]  # получение начала в таблице time_table
             id_start_activate = response[0]
@@ -383,6 +417,7 @@ class DataBase:
         :return: последняя запись
         """
         sql = f"SELECT id, id_timetable FROM timetable_time_activate WHERE id > {start_id} ORDER BY id_timetable ASC;"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         stop_id = self.__cursor.fetchone()  # получение конца таблицы расписания в time_table
         if stop_id:
@@ -394,6 +429,8 @@ class DataBase:
             self.__cursor.execute(sql)
             stop_id = self.__cursor.fetchone()  # получение последнего ID в time_table
             result = stop_id[0]
+
+        self.__cursor.close()
         return result
 
     def select_time_table_activate(self, class_letter='', week_day='', selected_day=''):
@@ -416,8 +453,10 @@ class DataBase:
               f"AND id_timetable = '{id_activate_time_table}' " \
               f"AND day_of_week = '{week_day}'" \
               "	ORDER BY lesson_number ASC;"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         response = self.__cursor.fetchall()  # получение расписания на день
+        self.__cursor.close()
         return response
 
     def select_one_activate_timetable(self, class_letter='', week_day='', selected_day=''):
@@ -430,8 +469,10 @@ class DataBase:
               "ON timetable.id_timetable = timetable_time_activate.id " \
               f"WHERE class = '{class_letter}' AND time_activate <= '{selected_day}' AND day_of_week = '{week_day}'" \
               "	ORDER BY time_activate, timetable_time_activate.id ASC;"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         response = self.__cursor.fetchone()  # получение ID активного расписания
+        self.__cursor.close()
         if response:
             response = response[0]
         else:
@@ -445,8 +486,10 @@ class DataBase:
         :return: list(role_id, invitation_sent, command_executable, time_completion)
         """
         sql = f"SELECT id, role_id, invitation_sent, command_executable, time_completion FROM users WHERE user_id_vk={id_user_vk};"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         result = self.__cursor.fetchone()
+        self.__cursor.close()
         return result
 
     def select_role_data(self, id_role=None, name_role=None):
@@ -467,8 +510,10 @@ class DataBase:
         # Если имя роли было пустым, то выборка по ID
         if id_role and not name_role:
             sql += f" WHERE id={id_role};"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         result = self.__cursor.fetchall()
+        self.__cursor.close()
         return result
 
     def insert_chat(self, data_chat=()):
@@ -484,8 +529,10 @@ class DataBase:
                 # если нет записи. то создаём
                 parameter = (item[3], item[2], item[5])
                 sql = "INSERT INTO public.chat_link(id_chat_vk, title_chat, link_chat) VALUES (%s, %s, %s);"
+                self.__cursor = self.__connect.cursor()
                 self.__cursor.execute(sql, parameter)
                 self.__connect.commit()
+                self.__cursor.close()
 
     def editor_time_table_db(self):
         """
@@ -511,8 +558,10 @@ class DataBase:
         """
         sql = "UPDATE chat_link SET title_chat=%s, link_chat=%s WHERE id_chat_vk=%s;"
         parameter = (title_chat, link_chat, id_chat_vk)
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql, parameter)
         self.__connect.commit()
+        self.__cursor.close()
 
     def select_chat(self, id_chat_vk=None):
         """
@@ -526,8 +575,10 @@ class DataBase:
         else:
             sql += ";"
         # print('sql= ', sql)
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         result = self.__cursor.fetchall()
+        self.__cursor.close()
         return result
 
     def delete_chat(self, id_chat_vk):
@@ -537,8 +588,10 @@ class DataBase:
         :return:
         """
         sql = f"DELETE FROM chat_link WHERE id_chat_vk=%s;"
+        self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql, id_chat_vk)
         self.__connect.commit()
+        self.__cursor.close()
         logging.info(f'Удаление данных чата {id_chat_vk}')
 
 
