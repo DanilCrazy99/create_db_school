@@ -64,8 +64,6 @@ def send_timetable(editor_id_vk, timetable_list, data_sheet=None):
                                    "id_timetable) "
                                    f"VALUES ({without_brackets})"
                                    )
-                    # id_first_timetable = str(cursor.fetchall())
-                    # id_first_timetable = id_first_timetable[2:-3]
                 else:
                     cursor.execute("INSERT INTO timetable (class, "
                                    "lesson_number, "
@@ -74,17 +72,6 @@ def send_timetable(editor_id_vk, timetable_list, data_sheet=None):
                                    "id_timetable )"
                                    f"VALUES ({without_brackets}) "
                                    )
-
-        # with connection.cursor() as cursor:
-        #     if data_sheet is None:
-        #         data_sheet = datetime.today()
-        #     cursor.execute("INSERT INTO timetable_time_activate ("
-        #                    "time_activate, "
-        #                    "editor_user_id, "
-        #                    "class_flow, "
-        #                    "id_timetable) "
-        #                    f"VALUES ('{data_sheet}', '{str(editor_id_vk)}', '{str(completed_list[0][0][:-1])}', {id_first_timetable})"
-        #                    )
 
             connection.commit()
     except Exception as _ex:
