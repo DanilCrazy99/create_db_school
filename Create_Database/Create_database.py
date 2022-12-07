@@ -1,17 +1,12 @@
 import psycopg2
-from Config.Var_database import main_database, user, password, host, port, schoolName, schoolPass
+from Config.Var_database import main_database, user, password, host, port, schoolName, schoolPass, \
+    default_data_role, default_data_status
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 
 def create_database_school():
     try:
-        connection = psycopg2.connect(
-            database=main_database,
-            user=user,
-            password=password,
-            host=host,
-            port=port
-        )
+        connection = connect_db()
         with connection.cursor() as cursor:
             # Смотрим список баз данных
             cursor.execute(
@@ -62,13 +57,7 @@ def create_database_school():
 
 def create_tables_in_new_db(case):
     try:
-        connection = psycopg2.connect(
-            database=schoolName,
-            user=user,
-            password=password,
-            host=host,
-            port=port
-        )
+        connection = connect_db()
         with connection.cursor() as cursor:
             if case == 1:
                 db_main_tables(cursor)
@@ -85,11 +74,60 @@ def create_tables_in_new_db(case):
             print("[INFO]Second Stream PostgreSQL: Tables created")
 
 
+def connect_db():
+    """
+    Создаем подключение к БД
+    :return: объект connection
+    """
+    connection = psycopg2.connect(
+            database=schoolName,
+            user=user,
+            password=password,
+            host=host,
+            port=port
+        )
+    return connection
+
+
+def fill_database():
+    """
+    Заполняем БД значениями по умолчанию
+    """
+    try:
+        connection = connect_db()
+        with connection.cursor() as cursor:
+            # Загружаем данные в таблицу статусов
+            for item in default_data_status:
+                cursor.execute(f"SELECT EXISTS (SELECT id FROM status WHERE status_member='{item[0]}' "
+                               f"AND key_stats_1={item[1]});")
+                result = cursor.fetchone()[0]
+                if not result:
+                    cursor.execute(f"INSERT INTO status(status_member, key_stats_1) VALUES ('{item[0]}', {item[1]});")
+                    connection.commit()
+
+            # Загружаем данные в таблицу ролей
+            for item in default_data_role:
+                cursor.execute(f"SELECT EXISTS (SELECT id FROM role WHERE role='{item}');")
+                result = cursor.fetchone()[0]
+                if not result:
+                    cursor.execute(f"INSERT INTO role(role) VALUES ('{item}');")
+                    connection.commit()
+
+    except Exception as _ex:
+        print("[INFO] Error while working with second stream PostgreSQL", _ex)
+    finally:
+        if connection:
+            connection.close()
+            print("[INFO]Success process: Fill DataBase")
+
+
+
 def input_case_var():
     case_var = int(input("Введите номер кейса, где\n"
                          "0 - Ничего не делать\n"
                          "1 - Создать базу данных, пользователя, и основную группу таблиц\n"
-                         "2 - Создать базу данных, пользователя, и все таблицы\n"))
+                         "2 - Создать базу данных, пользователя, и все таблицы\n"
+                         "3 - Заполнить базу данных значениями по умолчанию\n"))
     info_var = program_case(case_var)
     if info_var == 0:
         return 0
@@ -106,6 +144,9 @@ def program_case(case_value):
         print("Выполняется второй кейс")
         create_database_school()
         create_tables_in_new_db(2)
+    elif case_value == 3:
+        print("Заполняем БД данными по умолчанию")
+        fill_database()
     else:
         print("Введи другое число")
         return 0

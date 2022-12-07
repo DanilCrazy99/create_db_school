@@ -468,7 +468,7 @@ class DataBase:
               "FROM timetable INNER JOIN timetable_time_activate " \
               "ON timetable.id_timetable = timetable_time_activate.id " \
               f"WHERE class = '{class_letter}' AND time_activate <= '{selected_day}' AND day_of_week = '{week_day}'" \
-              "	ORDER BY time_activate, timetable_time_activate.id ASC;"
+              "	ORDER BY time_activate DESC;"
         self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         response = self.__cursor.fetchone()  # получение ID активного расписания

@@ -4,6 +4,7 @@
 from Create_Community_VK.Config.token import token_admin, token
 from collections import namedtuple
 
+# ID владельца токена
 user_admin = 1640521
 
 # группа тестовая
