@@ -135,6 +135,17 @@ class Group:
             return True
         return False
 
+    def msg_allow(self, id_user_vk):
+        """
+        Проверка разрешения получения сообщения от группы.
+        :param id_user_vk: ID пользователя в ВК
+        :return: bool
+        """
+        if self.vk.method('messages.isMessagesFromGroupAllowed',
+                          {'group_id': group_id, 'user_id': id_user_vk}) == 1:
+            return True  # Получение сообщений разрешено пользователем.
+        return False  # Получение сообщений Запрещено пользователем.
+
     def admins_group(self):
         """
         Достает список администраторов группы
