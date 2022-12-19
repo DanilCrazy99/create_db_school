@@ -65,6 +65,11 @@ class VkBot:
         :param attachment: Список присоединенных файлов
         :param keyboard: Сформированная клавиатура в json
         """
+        # проверка на разрешение получать сообщения
+        if not self.group.msg_allow(id_user_vk=self.from_id):
+            logging.info(f'Пользователь {self.from_id} запретил отправку ему сообщений')
+            return False  # Прерываем отправку сообщения.
+
         # print('отправка лс')
         parameters = {'message': message,
                       'keyboard': keyboard,
@@ -148,24 +153,31 @@ class VkBot:
                 # обработка поступившего личного сообщения
                 if event.type == VkBotEventType.MESSAGE_NEW:
                     self.new_msg = self.correct_msg(event.obj['text'])
-                    logging.info(f'Поступило сообщение "{self.new_msg}" от  {self.from_id}')
+
+                    # сохраняем пришедшие сообщения в бд
+                    self.msg_insert_db(user_id_vk=self.from_id, msg=self.new_msg)
+                    # logging.info(f'Поступило сообщение "{self.new_msg}" от  {self.from_id}')
 
                     # обработка присоединённого файла
                     if len(event.obj['attachments']) != 0:
-                        ext_file = event.obj['attachments'][0]['doc']['ext']
-                        # проверка файла по расширению и правам пользователя.
-                        if ext_file == 'xls':
-                            sql = f'SELECT role_id FROM users WHERE user_id_vk={self.from_id}'
-                            list_role_user = self.db.select_db(sql=sql)[0][0]
-                            role_editor = self.db.select_id_role(role='editor_time_table')
-                            if role_editor in list_role_user:
-                                print('поступил xls файл')
-                                logging.info('поступил xls файл')
-                                self.community.get_xl_file_from_msg(id_editor=self.from_id)
-                                self.send_msg('Файл добавлен в таблицу учета расписаний.')
-                            else:
-                                self.send_msg('Нет прав для загрузки расписания.')
-                            continue
+                        if event.obj['attachments'][0]['type'] == 'doc':
+                            print('прицеплен файл= ', event.obj['attachments'])
+                            ext_file = event.obj['attachments'][0]['doc']['ext']
+                            # проверка файла по расширению и правам пользователя.
+                            if ext_file == 'xls':
+                                sql = f'SELECT role_id FROM users WHERE user_id_vk={self.from_id}'
+                                list_role_user = self.db.select_db(sql=sql)[0][0]
+                                role_editor = self.db.select_id_role(role='editor_time_table')
+                                if role_editor in list_role_user:
+                                    print('поступил xls файл')
+                                    logging.info('поступил xls файл')
+                                    self.community.get_xl_file_from_msg(id_editor=self.from_id)
+                                    self.send_msg('Файл добавлен в таблицу учета расписаний.')
+                                else:
+                                    self.send_msg('Нет прав для загрузки расписания.')
+                                continue
+                        else:
+                            print('поступил не документ')
 
                     # проверка допустимости команды
                     if not (self.new_msg in control_word):
@@ -191,3 +203,12 @@ class VkBot:
             logging.error(f'Произошла ошибка в файле бота:{error_msg}')
             logging.info('Перезапуск...')
             time.sleep(5)
+
+    def msg_insert_db(self, user_id_vk, msg):
+        """
+        Добавляем сообщение в таблицу учета
+        :param user_id_vk: ID_VK пользователя
+        :param msg: пришедшее сообщение
+        """
+        sql = f"INSERT INTO public.bot_messages(msg, id_user_vk) VALUES ('{msg}', '{user_id_vk}');"
+        self.db.change_db(sql=sql)
