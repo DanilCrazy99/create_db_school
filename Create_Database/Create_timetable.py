@@ -92,20 +92,25 @@ def create_timetable_list(user_id_vk, path=tmp_path):
 
             for columns_name_class in range(4, max_column, 3):  # Создаем список классов на листе.
                 if sheet[2][columns_name_class].value:   # проверка существования данных в ячейке
-                    list_class.append(sheet[2][columns_name_class].value)  # добавляем описание класса "цифра буква"
+                    list_class.append(sheet[2][columns_name_class].value)  # добавляем описание класса в список
 
-            for columns in range(4, max_column, 3):  # переборка по столбцам листа "буква"
+            for columns in range(4, max_column, 3):  # переборка по столбцам листа
                 for rows in range(2, 7*count_lesson_day):  # переборка по строкам "номер урока" всех дней недели
 
-                    if max_row <= rows:
+                    if max_row <= rows:  # проверка на достижение конца таблицы
                         continue
 
-                    if sheet[rows][columns].value:  # Если выбранная ячейка содержит данные
-                        if sheet[rows][columns].value in list_class:  # Значение ячейки есть в списке с классами
+                    flag_no_lesson = True  # Флаг указывающий, что в течение дня нет уроков
+
+                    if sheet[rows][columns].value in list_class:  # Значение ячейки есть в списке с классами
+                        if sheet[rows][columns].value:  # Если выбранная ячейка содержит данные
                             name_class = sheet[rows][columns].value
 
+                            incr = len(list_lessons) - 1
+                            flag_no_lesson = True  # Флаг указывающий, что в течение дня нет уроков
                             for i in range(count_lesson_day):  # Записываем count_lesson_day строк под ним
                                 incr = len(list_lessons) - 1
+
                                 # прерываем цикл по достижении конца таблицы с данными
                                 if max_row <= (rows + i + 1):
                                     continue
@@ -128,12 +133,22 @@ def create_timetable_list(user_id_vk, path=tmp_path):
                                         number_cab = sheet[lesson_cell_coordinate_number][columns+1].value
                                         if len(number_cab) > 0:
                                             number_cab = '(' + number_cab + ')'
-                                    tmp_lesson = sheet[lesson_cell_coordinate_number][3].value \
-                                                 + ' ' + sheet[lesson_cell_coordinate_number][columns].value \
+                                    tmp_lesson = str(sheet[lesson_cell_coordinate_number][3].value) \
+                                                 + ' ' + str(sheet[lesson_cell_coordinate_number][columns].value) \
                                                  + f' {number_cab}'
                                     list_lessons[incr].append(tmp_lesson)  # описание урока
                                     list_lessons[incr].append(sheet[rows+1][0].value)  # день недели урока
+                                    flag_no_lesson = False
                                 list_lessons.append([])
+
+                            # проверка на пустое расписание на день
+                            if flag_no_lesson:
+                                list_lessons[incr].append(name_class)  # описание класса
+                                list_lessons[incr].append(0)  # номер урока
+                                list_lessons[incr].append('нет уроков')  # описание урока
+                                list_lessons[incr].append(sheet[rows+1][0].value)  # день недели урока
+                                list_lessons.append([])
+
 
             # отправляем данные на загрузку в БД
             send_timetable(editor_id_vk=user_id_vk, timetable_list=list_lessons, data_sheet=date_time)
