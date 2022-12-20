@@ -89,7 +89,7 @@ def controller_keyboard(id_user_vk, role_user_vk, key_command=None):
                 key_set = 4
                 user.set_user_status_server(id_user_vk=id_user_vk, id_status=db.select_status(key_stat=key_set))
                 result_msg = 'Выберите день, для запроса расписания.'
-            elif key_command == '/меню':
+            elif (key_command == '/меню') or (key_command == 'начать'):
                 key_set = 1
                 user.set_user_status_server(id_user_vk=id_user_vk, id_status=db.select_status(key_stat=key_set))
                 result_msg = 'Основное меню.'
@@ -217,7 +217,9 @@ def generator_keyboard(set_keyboard, id_user_vk=0, inline=False, flow_class=0):
         keyboard.add_button('/начальные классы', color=VkKeyboardColor.POSITIVE)
         keyboard.add_button('/старшие классы', color=VkKeyboardColor.POSITIVE)
         keyboard.add_line()  # Переход на новую строку
-        keyboard.add_button('/help', color=VkKeyboardColor.PRIMARY)
+        if chat.list_chat_user(user_id_vk=id_user_vk):
+            keyboard.add_button('/к расписанию', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('/help', color=VkKeyboardColor.NEGATIVE)
         result = keyboard.get_keyboard()
 
     elif set_keyboard == 2 or set_keyboard == 21:  # клавиатура выбора потока среди классов
@@ -274,6 +276,10 @@ def generator_keyboard(set_keyboard, id_user_vk=0, inline=False, flow_class=0):
             flag = key_week[item[1:]]
             if flag == 1:
                 color_key = VkKeyboardColor.NEGATIVE
+            elif flag == 2:
+                color_key = VkKeyboardColor.PRIMARY
+            elif flag == 3:
+                color_key = VkKeyboardColor.SECONDARY
             else:
                 color_key = VkKeyboardColor.POSITIVE
             keyboard.add_button(item, color=color_key)
@@ -334,6 +340,8 @@ def week_dict(user_id_vk):
     week_current = []
     name_class = []
     flag_day = []
+    holiday = ['каникул']
+    bad_day = ['карантин', 'нет уроков']
     w_key = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс']
     # временная заглушка
     flag_day = [0, 0, 0, 0, 0, 0, 0]
@@ -375,26 +383,69 @@ def week_dict(user_id_vk):
             wd = list_week_words[item]
             wdc = wd.capitalize()
 
-            result1 = db.select_time_table_activate(class_letter=current_class, week_day=wdc, selected_day=act_day)
-            result2 = db.select_time_table_activate(class_letter=current_class, week_day=wdc, selected_day=control_day)
+            action_response = db.select_time_table_activate(class_letter=current_class,
+                                                            week_day=wdc, selected_day=act_day)
+            control_response = db.select_time_table_activate(class_letter=current_class,
+                                                             week_day=wdc, selected_day=control_day)
 
-            step = 0
-            if len(result1) == len(result2):
-                for s1 in result1:
-                    s2 = result2[step]
-                    if (not s1[2] == s2[2]) or flag_day[step] == 1:
-                        flag = 1
+            if len(action_response) > 0:  # список дня активной даты
+                # вытаскиваем урок из активного дня
+                action_step = 0
+                for action_lesson in action_response:
+                    # проверяем на наличие в активном дне слово "каникулы"
+                    for special_day in holiday:
+                        test_holiday = str(action_lesson[2]).lower()
+                        if test_holiday.find(special_day) > 0:
+                            flag_day[item] = 2
+                            break
+
+                    # проверяем на наличие в активном дне слово "карантин"
+                    for special_day in bad_day:
+                        test_holiday = str(action_lesson[2]).lower()
+                        if test_holiday.find(special_day) >= 0:
+                            flag_day[item] = 3
+                            break
+
+                    if len(control_response) > 0:  # список дня контрольной даты
+                        if (len(action_response) != len(control_response)) \
+                                and (flag_day[item] != 2) \
+                                and (flag_day[item] != 3):
+                            flag_day[item] = 1
+                            break
+                        else:
+                            if (action_lesson[2] != control_response[action_step][2]) \
+                                    and (flag_day[item] != 2) \
+                                    and (flag_day[item] != 3):
+                                flag_day[item] = 1
+                                break
                     else:
-                        flag = 0
-                    # print('act_day= ', act_day, ' control_day= ', control_day, ' день- ', wdc, ' flag= ', flag)
-                    flag_day[step] = flag
-                    step += 1
+                        # проверить урок активной недели на текст каникулы
+                        flag_day[item] = 1  # красный
+                        break  # прерываем цикл
+
+                    action_step += 1
             else:
-                flag_day[item] = 1
+                flag_day[item] = change_color_flag(flag_day=flag_day, index_control=item)
     # ************************************
 
     week_key = dict(zip(w_key, flag_day))
+    # print('week_key= ', week_key)
     return week_key
+
+
+def change_color_flag(flag_day, index_control):
+    """
+    Выставление приоритетов цвета кнопок при изменении на входе
+    :param flag_day: список флагов цветов
+    :param index_control: проверяемая позиция
+    :return: приоритетный цвет
+    """
+    if flag_day[index_control] != 1:  # приоритет если день уже красный
+        if flag_day[index_control] != 2:  # приоритет если день синий
+            if flag_day[index_control] == 0:  # если необходимо заменить с зеленого на серый
+                return 3  # Если активный день пустой. То красим кнопку в серый цвет
+
+    return flag_day[index_control]
 
 
 if __name__ == '__main__':
