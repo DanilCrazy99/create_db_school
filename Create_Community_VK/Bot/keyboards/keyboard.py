@@ -85,6 +85,10 @@ def controller_keyboard(id_user_vk, role_user_vk, key_command=None):
                     key_set = 1
                     user.set_user_status_server(id_user_vk=id_user_vk, id_status=db.select_status(key_stat=key_set))
                     result_msg = 'Выберите чат своего класса.'
+                elif key_set == 1:
+                    key_set = 1
+                    user.set_user_status_server(id_user_vk=id_user_vk, id_status=db.select_status(key_stat=key_set))
+                    result_msg = 'Основное меню.'
             elif key_command == '/к расписанию':
                 key_set = 4
                 user.set_user_status_server(id_user_vk=id_user_vk, id_status=db.select_status(key_stat=key_set))
@@ -413,7 +417,14 @@ def week_dict(user_id_vk):
                             flag_day[item] = 1
                             break
                         else:
-                            if (action_lesson[2] != control_response[action_step][2]) \
+                            if (len(control_response)-1) >= action_step:  # Проверяем кол-во уроков.
+                                # Номер шага позволяем достать элемент списка
+                                # print('len(control_response)= ', len(control_response), ' action_step= ', action_step)
+                                tmp_control_lesson = control_response[action_step][2]
+                            else:
+                                # Иначе список урока пуст
+                                tmp_control_lesson = ''
+                            if (action_lesson[2] != tmp_control_lesson) \
                                     and (flag_day[item] != 2) \
                                     and (flag_day[item] != 3):
                                 flag_day[item] = 1
