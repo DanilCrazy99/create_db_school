@@ -209,7 +209,8 @@ def db_main_tables(cursor):
         name text NOT NULL, \
         patronymic text, \
         surname text, \
-        phone integer\
+        phone integer,\
+        id_list_discipline integer ARRAY\
         );"
                    )
 
@@ -257,7 +258,7 @@ def db_main_tables(cursor):
         id bigserial NOT NULL PRIMARY KEY, \
         msg text NOT NULL, \
         id_user_vk integer NOT NULL, \
-        time timestamp without time zone DEFAULT CURRENT_TIMESTAMP\
+        time_msg timestamp without time zone DEFAULT CURRENT_TIMESTAMP\
         );"
                    )
 
