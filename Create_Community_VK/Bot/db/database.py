@@ -55,7 +55,7 @@ class DataBase:
 
     def change_db(self, sql):
         """
-        Изменение данных в БД
+        Изменение/добавление данных в БД
         :param sql: строка SQL запроса.
         :return:
         """
@@ -219,11 +219,11 @@ class DataBase:
         """
         # проверка на наличие в БД юзера с пришедшим ID
         result = self.select_user(user_id_vk=user_id)
-        self.list_role.append(role_id)
         if not result:
             sql = "INSERT INTO users(user_id_vk, role_id, invitation_sent) VALUES (%s, %s, %s) RETURNING id;"
             # параметр invitation_sent ставим в False (не отправлено)
             invitation = False
+            self.list_role.append(role_id)  # добавляем учет роли
             parameter = (user_id, self.list_role, invitation)
             self.__cursor = self.__connect.cursor()
             self.__cursor.execute(sql, parameter)
@@ -464,11 +464,12 @@ class DataBase:
         получить один ID ближайшего активного расписания.
         :return: ID активного расписания
         """
+        # print('selected_day=', selected_day)
         sql = "SELECT timetable_time_activate.id " \
               "FROM timetable INNER JOIN timetable_time_activate " \
               "ON timetable.id_timetable = timetable_time_activate.id " \
-              f"WHERE class = '{class_letter}' AND time_activate <= '{selected_day}' AND day_of_week = '{week_day}'" \
-              "	ORDER BY time_activate DESC;"
+              f"WHERE class = '{class_letter}' AND time_activate <= '{selected_day}' AND day_of_week = '{week_day}' " \
+              "ORDER BY time_activate DESC;"
         self.__cursor = self.__connect.cursor()
         self.__cursor.execute(sql)
         response = self.__cursor.fetchone()  # получение ID активного расписания
