@@ -84,6 +84,21 @@ class Community:
         self.db.insert_user_status_server(user_id_vk=user_id, status_id=1)
         return result
 
+    def discipline_teacher(self, id_user_vk):
+        """
+        Список предметов которые ведет преподаватель.
+        :param id_user_vk: ID пользователя в ВК
+        :return: list id предметов
+        """
+        sql = 'SELECT id_list_discipline FROM teacher INNER JOIN users ON users.id = teacher.user_id ' \
+              f'WHERE user_id_vk = {id_user_vk}'
+        result = self.db.select_db(sql=sql)
+        if not result:
+            result = []
+        else:
+            result = result[0][0]
+        return result
+
     def check_is_member_chat(self, user_id):
         """
         Получение ID где состоит пользователь
