@@ -1,4 +1,6 @@
 # create_db_school
+<a href="https://codeclimate.com/github/DanilCrazy99/create_db_school/maintainability"><img src="https://api.codeclimate.com/v1/badges/dd8d8406813edb216887/maintainability" /></a>
+
 Для работы с файлом Create Database/Create_database.py необходимо установить библиотеку psycopg2
 
     pip install psycopg2-binary
