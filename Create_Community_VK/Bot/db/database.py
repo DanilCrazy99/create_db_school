@@ -101,28 +101,6 @@ class DataBase:
         self.__cursor.close()
         return result
 
-    def select_roles_with_vk_id(self, id_user):
-        """
-        Проверка на наличие специфичной роли в postgres
-        """
-        self.__cursor = self.__connect.cursor()
-        with self.__cursor() as cursor:
-            cursor.execute(
-                "SELECT * FROM role INNER JOIN users ON role.id = users.role_id;"
-            )
-            a = cursor.fetchall()  # Забираю результат командной строки
-            b = []
-            d = []
-            for c in range(len(a)):
-                b.append(a[c][1])  # Получаю роли
-                d.append(a[c][4])  # Получаю id
-            e = {'role': b}
-            f = {'id': d}
-            if id_user in f['id']:
-                for i in range(len(f['id'])):
-                    if f['id'][i] == id_user:
-                        return e['role'][i]
-
     # добавление описателя статуса
     def insert_status_name(self, status_name):
         """
@@ -308,8 +286,9 @@ class DataBase:
             list_role.append(role_id_db)
 
         if new_role_flag == 1:
-            if not (role_id_db in list_role):
+            if role_id_db not in list_role:
                 list_role.append(role_id_db)
+
         return list_role
 
     def select_id_role(self, role):
