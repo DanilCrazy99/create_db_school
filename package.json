@@ -1,0 +1,22 @@
+{
+  "name": "site_school_with_timetable",
+  "version": "0.0.1",
+  "description": "Site with timetable",
+  "main": "./Site_with_timetable/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DanilCrazy99/create_db_school.git"
+  },
+  "author": "Danil Volkov (volchara287@gmail.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DanilCrazy99/create_db_school/issues"
+  },
+  "homepage": "https://github.com/DanilCrazy99/create_db_school#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
