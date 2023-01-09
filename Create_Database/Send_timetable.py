@@ -59,7 +59,9 @@ def send_timetable(editor_id_vk, timetable_list, data_sheet=None):
                     send_trigger = True
                     cursor.execute("INSERT INTO timetable (class, "
                                    "lesson_number, "
+                                   "time_lesson, "
                                    "academic_discipline, "
+                                   "room_lesson, "
                                    "day_of_week, "
                                    "id_timetable) "
                                    f"VALUES ({without_brackets})"
@@ -67,7 +69,9 @@ def send_timetable(editor_id_vk, timetable_list, data_sheet=None):
                 else:
                     cursor.execute("INSERT INTO timetable (class, "
                                    "lesson_number, "
+                                   "time_lesson, "
                                    "academic_discipline, "
+                                   "room_lesson, "
                                    "day_of_week, "
                                    "id_timetable )"
                                    f"VALUES ({without_brackets}) "
