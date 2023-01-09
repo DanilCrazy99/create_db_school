@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # файл для работы с бд Postgresql
 
-import sys
-import os
 import psycopg2
 import logging
 
@@ -426,7 +424,9 @@ class DataBase:
                                                                     week_day=week_day,
                                                                     selected_day=selected_day)
 
-        sql = "SELECT class, lesson_number, academic_discipline, day_of_week " \
+        sql = "SELECT class, " \
+              "lesson_number, CONCAT(time_lesson, ' ', academic_discipline, ' ' , room_lesson), " \
+              "day_of_week " \
               "FROM timetable " \
               f"WHERE class = '{class_letter}' " \
               f"AND id_timetable = '{id_activate_time_table}' " \
