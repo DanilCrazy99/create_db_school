@@ -209,7 +209,8 @@ def db_main_tables(cursor):
         name text NOT NULL, \
         patronymic text, \
         surname text, \
-        phone integer,\
+        phone text,\
+        user_id integer,\
         id_list_discipline integer ARRAY\
         );"
                    )
@@ -236,7 +237,9 @@ def db_main_tables(cursor):
         id bigserial NOT NULL PRIMARY KEY, \
         class text NOT NULL, \
         lesson_number integer NOT NULL, \
+        time_lesson text, \
         academic_discipline text NOT NULL, \
+        room_lesson text, \
         day_of_week text NOT NULL, \
         id_timetable integer NOT NULL \
         );"
