@@ -6,13 +6,24 @@ class Discipline:
     def __init__(self):
         self.db = DataBase()
 
+    @ staticmethod
+    def transformation(description):
+        """
+        Приведение дисциплины к нижнему регистру и удаление пробелов.
+        :param description: Описание дисциплины
+        :return: str
+        """
+        result = ' '.join(description.split())
+        result = result.lower()
+        return result
+
     def __insert_discipline(self, description):
         """
         Добавляем дисциплину в БД
         :param description: Описание дисциплины
         :return: ID дисциплины в БД
         """
-        sql = f"INSERT INTO academic_discipline(name) VALUES ('{description}') RETURNING id;"
+        sql = f"INSERT INTO academic_discipline(name) VALUES ('{self.transformation(description)}') RETURNING id;"
         result = self.db.change_db(sql)  # Получаем iD дисциплины
         return result
 
@@ -21,7 +32,7 @@ class Discipline:
         Получение ID дисциплины в БД
         :return: ID дисциплины
         """
-        sql = f"SELECT id, name FROM academic_discipline WHERE name='{description}';"
+        sql = f"SELECT id, name FROM academic_discipline WHERE name='{self.transformation(description)}';"
         result = self.db.select_db(sql=sql)
         if not result:
             return 0
@@ -33,7 +44,7 @@ class Discipline:
         :param description: Название дисциплины.
         :return: ID дисциплины или 0 если нет.
         """
-        description = description.lower()
+        description = self.transformation(description)
         result = self.select_discipline_id(description=description)
         if result:
             # если есть данные
@@ -47,4 +58,4 @@ class Discipline:
 
 if __name__ == '__main__':
     discipline = Discipline()
-    print(discipline.date('Математика'))
+    print(discipline.date('  Математика     и руссКий '))
