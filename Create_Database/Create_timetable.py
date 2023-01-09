@@ -3,9 +3,12 @@
 import openpyxl
 import xlrd
 from Create_Database.Send_timetable import send_timetable
+from Create_Community_VK.Bot.Discipline.discipline import Discipline
 
 # имя загружаемого файла
 tmp_path = 'timetable.xls'
+
+discipline = Discipline()
 
 
 def create_timetable_list_xlsx(path=tmp_path):
@@ -125,6 +128,15 @@ def create_timetable_list(user_id_vk, path=tmp_path):
 
                                     list_lessons[incr].append(name_class)  # описание класса
                                     list_lessons[incr].append(int(sheet[lesson_cell_coordinate_number][1].value))  # номер урока
+
+                                    time_lesson = str(sheet[lesson_cell_coordinate_number][3].value)
+                                    list_lessons[incr].append(time_lesson)  # время урока
+
+                                    # описание урока
+                                    description_lesson = str(sheet[lesson_cell_coordinate_number][columns].value)
+                                    id_discipline = discipline.date(description=description_lesson)
+                                    list_lessons[incr].append(id_discipline)  # id дисциплины из БД
+
                                     if sheet.cell_type(lesson_cell_coordinate_number, columns+1) == 2:
                                         number_cab = '(каб.' \
                                                      + str(int(sheet[lesson_cell_coordinate_number][columns + 1].value)) \
@@ -133,10 +145,8 @@ def create_timetable_list(user_id_vk, path=tmp_path):
                                         number_cab = sheet[lesson_cell_coordinate_number][columns+1].value
                                         if len(number_cab) > 0:
                                             number_cab = '(' + number_cab + ')'
-                                    tmp_lesson = str(sheet[lesson_cell_coordinate_number][3].value) \
-                                                 + ' ' + str(sheet[lesson_cell_coordinate_number][columns].value) \
-                                                 + f' {number_cab}'
-                                    list_lessons[incr].append(tmp_lesson)  # описание урока
+
+                                    list_lessons[incr].append(number_cab)  # кабинет проведения урока
                                     list_lessons[incr].append(sheet[rows+1][0].value)  # день недели урока
                                     flag_no_lesson = False
                                 list_lessons.append([])
@@ -145,7 +155,9 @@ def create_timetable_list(user_id_vk, path=tmp_path):
                             if flag_no_lesson:
                                 list_lessons[incr].append(name_class)  # описание класса
                                 list_lessons[incr].append(0)  # номер урока
+                                list_lessons[incr].append('---')  # время урока
                                 list_lessons[incr].append('нет уроков')  # описание урока
+                                list_lessons[incr].append('---')  # кабинет проведения урока
                                 list_lessons[incr].append(sheet[rows+1][0].value)  # день недели урока
                                 list_lessons.append([])
 
