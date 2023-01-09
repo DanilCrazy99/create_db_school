@@ -425,9 +425,9 @@ class DataBase:
                                                                     selected_day=selected_day)
 
         sql = "SELECT class, " \
-              "lesson_number, CONCAT(time_lesson, ' ', academic_discipline, ' ' , room_lesson), " \
+              "lesson_number, CONCAT(time_lesson, ' ', academic_discipline.name, ' ' , room_lesson), " \
               "day_of_week " \
-              "FROM timetable " \
+              "FROM timetable INNER JOIN academic_discipline ON academic_discipline.id = timetable.id_discipline " \
               f"WHERE class = '{class_letter}' " \
               f"AND id_timetable = '{id_activate_time_table}' " \
               f"AND day_of_week = '{week_day}'" \
